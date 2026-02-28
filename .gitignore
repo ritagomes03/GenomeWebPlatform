@@ -1,0 +1,22 @@
+# Environments
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Data files (Optional: Remove if you want these available in the repo)
+genomes.csv
+metadados.csv
+__pycache__
+.pyc
+data/
+*.csv

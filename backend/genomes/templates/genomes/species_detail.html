@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ taxonomy.species }} - Details</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 24px;
+        }
+
+        .back-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-nav a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.025em;
+        }
+
+        .taxonomy-info {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 1.05rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .stat-card strong {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-card span {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .pdf-section {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .pdf-link {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border: 1px solid #fee2e2;
+            background: #fef2f2;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .pdf-link:hover {
+            background: #fee2e2;
+        }
+
+        .table-wrapper {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .accession-no {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .pagination {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .pagination a:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination span {
+            padding: 8px 16px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: #0f172a;
+            margin: 0 0 16px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="back-nav">
+            <a href="{% url 'species_list' %}">&larr; Back to Species List</a>
+        </div>
+        
+        <h1><em>{{ taxonomy.species }}</em></h1>
+        
+        <div class="taxonomy-info">
+            Family: <strong>{{ taxonomy.family|default:"-" }}</strong> &bull; 
+            Genus: <strong>{{ taxonomy.genus|default:"-" }}</strong>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <strong>Length (bp)</strong>
+                <span>
+                    {% if taxonomy.max_length %}
+                        {% if taxonomy.max_length == taxonomy.min_length %}{{ taxonomy.max_length }}{% else %}{{ taxonomy.min_length }} - {{ taxonomy.max_length }}{% endif %}
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+            <div class="stat-card">
+                <strong>GC Content (%)</strong>
+                <span>
+                    {% if taxonomy.max_gc != None %}
+                        {% if taxonomy.max_gc == taxonomy.min_gc %}{{ taxonomy.max_gc|floatformat:2 }}{% else %}{{ taxonomy.min_gc|floatformat:2 }} - {{ taxonomy.max_gc|floatformat:2 }}{% endif %}
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+            <div class="stat-card">
+                <strong>Melting Temp (°C)</strong>
+                <span>
+                    {% if taxonomy.max_mt != None %}
+                        {% if taxonomy.max_mt == taxonomy.min_mt %}{{ taxonomy.max_mt|floatformat:2 }}{% else %}{{ taxonomy.min_mt|floatformat:2 }} - {{ taxonomy.max_mt|floatformat:2 }}{% endif %}
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+            <div class="stat-card">
+                <strong>Entropy</strong>
+                <span>
+                    {% if taxonomy.max_ent != None %}
+                        {% if taxonomy.max_ent == taxonomy.min_ent %}{{ taxonomy.max_ent|floatformat:2 }}{% else %}{{ taxonomy.min_ent|floatformat:2 }} - {{ taxonomy.max_ent|floatformat:2 }}{% endif %}
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+            <div class="stat-card">
+                <strong>Collection Dates</strong>
+                <span style="font-size: 1rem;">
+                    {% if taxonomy.first_collection %}
+                        {% if taxonomy.first_collection == taxonomy.last_collection %}{{ taxonomy.first_collection }}{% else %}{{ taxonomy.first_collection }} to {{ taxonomy.last_collection }}{% endif %}
+                    {% else %} - {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="pdf-section">
+            <strong style="color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Visualizations:</strong>
+            <a href="/static/charts/{{ taxonomy.species }}_gc.pdf" target="_blank" class="pdf-link">GC Profile PDF</a>
+            <a href="/static/charts/{{ taxonomy.species }}_entropy.pdf" target="_blank" class="pdf-link">Entropy Profile PDF</a>
+        </div>
+
+        <h3>Individual Sequences ({{ taxonomy.sequence_count }})</h3>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Accession</th>
+                        <th>Country</th>
+                        <th>Date</th>
+                        <th>Length</th>
+                        <th>Entropy</th>
+                        <th>% GC</th>
+                        <th>Melting Temp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sequences %}
+                    <tr>
+                        <td class="accession-no">{{ s.accession }}</td>
+                        <td>{{ s.country|default:"-" }}</td>
+                        <td>{{ s.collection_date|date:"Y-m-d"|default:"-" }}</td>
+                        <td>{{ s.metrics.length|default:"-" }}</td>
+                        <td>{{ s.metrics.entropy|floatformat:2|default:"-" }}</td>
+                        <td>{{ s.metrics.gc_content|floatformat:2|default:"-" }}</td>
+                        <td>{{ s.metrics.melting_temp|floatformat:2|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            {% if sequences.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ sequences.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            <span>Page {{ sequences.number }} of {{ sequences.paginator.num_pages }}</span>
+
+            {% if sequences.has_next %}
+                <a href="?page={{ sequences.next_page_number }}">Next</a>
+                <a href="?page={{ sequences.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
