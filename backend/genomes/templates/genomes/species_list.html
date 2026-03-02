@@ -7,6 +7,8 @@
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
             --bg: #f8fafc;
             --surface: #ffffff;
             --text: #334155;
@@ -40,6 +42,137 @@
             color: var(--text-muted);
             margin-bottom: 24px;
             font-size: 0.95rem;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .sorting-controls {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .sort-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sort-link:hover {
+            background: #e2e8f0;
+        }
+
+        .sort-link.active {
+            font-weight: 700;
+            color: var(--primary);
+            background: #dbeafe;
+        }
+
+        .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background-color: var(--success);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background-color: var(--success-hover);
+            color: white;
+            text-decoration: none;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-form input {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 250px;
+            transition: border-color 0.2s;
+        }
+
+        .search-form input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-form button {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-form button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 250px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            z-index: 50;
+            display: none;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+
+        .suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f8fafc;
+            color: var(--primary);
         }
 
         .table-wrapper {
@@ -133,6 +266,27 @@
         <h1>Species Database</h1>
         <p class="stats">Total Species: <strong>{{ total_species }}</strong> &bull; Total Sequences: <strong>{{ total_sequences }}</strong></p>
 
+        <div class="controls-wrapper">
+            <div class="sorting-controls">
+                <span>Sort by:</span>
+                <a href="?sort=frequency&q={{ search_query }}" class="sort-link {% if current_sort == 'frequency' %}active{% endif %}">Most Frequent</a>
+                <a href="?sort=az&q={{ search_query }}" class="sort-link {% if current_sort == 'az' %}active{% endif %}">A-Z</a>
+            </div>
+
+            <div class="right-controls">
+                <a href="{% url 'download_global_fasta' %}" class="download-btn">Download FASTA (ZIP)</a>
+                
+                <form class="search-form" method="GET" action="">
+                    <input type="hidden" name="sort" value="{{ current_sort }}">
+                    <div class="search-wrapper">
+                        <input type="text" name="q" placeholder="Pesquisar por espécie..." value="{{ search_query }}" autocomplete="off">
+                        <div id="suggestions" class="suggestions-dropdown"></div>
+                    </div>
+                    <button type="submit">Pesquisar</button>
+                </form>
+            </div>
+        </div>
+
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -154,7 +308,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                            No species found. Did the populate_db command run successfully?
+                            Nenhuma espécie encontrada.
                         </td>
                     </tr>
                     {% endfor %}
@@ -164,18 +318,59 @@
 
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                <a href="?page=1&sort={{ current_sort }}&q={{ search_query }}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}&q={{ search_query }}">Previous</a>
             {% endif %}
 
             <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                <a href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}&q={{ search_query }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ current_sort }}&q={{ search_query }}">Last &raquo;</a>
             {% endif %}
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.querySelector('input[name="q"]');
+            const dropdown = document.getElementById('suggestions');
+
+            input.addEventListener('input', async (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`{% url 'species_autocomplete' %}?q=${encodeURIComponent(query)}`);
+                    const suggestions = await res.json();
+
+                    if (suggestions.length > 0) {
+                        dropdown.innerHTML = suggestions.map(s => `<div class="suggestion-item">${s}</div>`).join('');
+                        dropdown.style.display = 'block';
+
+                        dropdown.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                input.value = item.textContent;
+                                input.closest('form').submit();
+                            });
+                        });
+                    } else {
+                        dropdown.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Erro a procurar sugestões:", error);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-wrapper')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -14,7 +14,6 @@
             --text-muted: #64748b;
             --border: #e2e8f0;
         }
-
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
@@ -23,175 +22,57 @@
             padding: 40px 20px;
             line-height: 1.5;
         }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .back-nav { margin-bottom: 24px; }
+        .back-nav a { color: var(--primary); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+        .back-nav a:hover { text-decoration: underline; }
+        h1 { font-size: 2.2rem; font-weight: 700; color: #0f172a; margin: 0 0 8px 0; }
+        .taxonomy-info { color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+        .stat-card strong { display: block; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-card span { font-size: 1.2rem; font-weight: 600; color: #0f172a; }
+        
+        .graph-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; }
+        .btn-download { display: inline-flex; align-items: center; gap: 8px; background-color: var(--primary); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: background-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .btn-download:hover { background-color: var(--primary-hover); }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+        .table-wrapper { background: var(--surface); border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 0.75rem; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 24px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        .accession-no { font-family: monospace; color: var(--primary); font-weight: 600; }
+        .pagination { margin-top: 24px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .pagination a { padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; text-decoration: none; }
+        .pagination a:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .pagination span { padding: 8px 16px; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
+        h3 { font-size: 1.5rem; color: #0f172a; margin: 0 0 16px 0; }
 
-        .back-nav {
-            margin-bottom: 24px;
-        }
-
-        .back-nav a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .back-nav a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0 0 8px 0;
-            letter-spacing: -0.025em;
-        }
-
-        .taxonomy-info {
+        .empty-state {
+            background: var(--surface);
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 48px 20px;
+            text-align: center;
             color: var(--text-muted);
             margin-bottom: 32px;
-            font-size: 1.05rem;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            color: #94a3b8;
+            margin-bottom: 12px;
         }
-
-        .stat-card {
-            background: var(--surface);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-        }
-
-        .stat-card strong {
-            display: block;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-
-        .stat-card span {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .pdf-section {
-            background: var(--surface);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-bottom: 40px;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .pdf-link {
-            color: #ef4444;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            border: 1px solid #fee2e2;
-            background: #fef2f2;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .pdf-link:hover {
-            background: #fee2e2;
-        }
-
-        .table-wrapper {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f8fafc;
-            font-weight: 600;
-            color: #475569;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.95rem;
-        }
-
-        .accession-no {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .pagination {
-            margin-top: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .pagination a {
-            padding: 8px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+        .empty-state p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
             color: var(--text);
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            text-decoration: none;
         }
-
-        .pagination a:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .pagination span {
-            padding: 8px 16px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        h3 {
-            font-size: 1.5rem;
-            color: #0f172a;
-            margin: 0 0 16px 0;
+        .empty-state span {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.95rem;
         }
     </style>
 </head>
@@ -210,53 +91,45 @@
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
-                <strong>Length (bp)</strong>
-                <span>
-                    {% if taxonomy.max_length %}
-                        {% if taxonomy.max_length == taxonomy.min_length %}{{ taxonomy.max_length }}{% else %}{{ taxonomy.min_length }} - {{ taxonomy.max_length }}{% endif %}
-                    {% else %} - {% endif %}
-                </span>
-            </div>
-            <div class="stat-card">
-                <strong>GC Content (%)</strong>
-                <span>
-                    {% if taxonomy.max_gc != None %}
-                        {% if taxonomy.max_gc == taxonomy.min_gc %}{{ taxonomy.max_gc|floatformat:2 }}{% else %}{{ taxonomy.min_gc|floatformat:2 }} - {{ taxonomy.max_gc|floatformat:2 }}{% endif %}
-                    {% else %} - {% endif %}
-                </span>
-            </div>
-            <div class="stat-card">
-                <strong>Melting Temp (°C)</strong>
-                <span>
-                    {% if taxonomy.max_mt != None %}
-                        {% if taxonomy.max_mt == taxonomy.min_mt %}{{ taxonomy.max_mt|floatformat:2 }}{% else %}{{ taxonomy.min_mt|floatformat:2 }} - {{ taxonomy.max_mt|floatformat:2 }}{% endif %}
-                    {% else %} - {% endif %}
-                </span>
-            </div>
-            <div class="stat-card">
-                <strong>Entropy</strong>
-                <span>
-                    {% if taxonomy.max_ent != None %}
-                        {% if taxonomy.max_ent == taxonomy.min_ent %}{{ taxonomy.max_ent|floatformat:2 }}{% else %}{{ taxonomy.min_ent|floatformat:2 }} - {{ taxonomy.max_ent|floatformat:2 }}{% endif %}
-                    {% else %} - {% endif %}
-                </span>
-            </div>
-            <div class="stat-card">
-                <strong>Collection Dates</strong>
-                <span style="font-size: 1rem;">
-                    {% if taxonomy.first_collection %}
-                        {% if taxonomy.first_collection == taxonomy.last_collection %}{{ taxonomy.first_collection }}{% else %}{{ taxonomy.first_collection }} to {{ taxonomy.last_collection }}{% endif %}
-                    {% else %} - {% endif %}
-                </span>
-            </div>
+            <div class="stat-card"><strong>Length (bp)</strong><span>{% if taxonomy.max_length %}{% if taxonomy.max_length == taxonomy.min_length %}{{ taxonomy.max_length }}{% else %}{{ taxonomy.min_length }} - {{ taxonomy.max_length }}{% endif %}{% else %} - {% endif %}</span></div>
+            <div class="stat-card"><strong>GC Content (%)</strong><span>{% if taxonomy.max_gc != None %}{% if taxonomy.max_gc == taxonomy.min_gc %}{{ taxonomy.max_gc|floatformat:2 }}{% else %}{{ taxonomy.min_gc|floatformat:2 }} - {{ taxonomy.max_gc|floatformat:2 }}{% endif %}{% else %} - {% endif %}</span></div>
+            <div class="stat-card"><strong>Melting Temp (°C)</strong><span>{% if taxonomy.max_mt != None %}{% if taxonomy.max_mt == taxonomy.min_mt %}{{ taxonomy.max_mt|floatformat:2 }}{% else %}{{ taxonomy.min_mt|floatformat:2 }} - {{ taxonomy.max_mt|floatformat:2 }}{% endif %}{% else %} - {% endif %}</span></div>
+            <div class="stat-card"><strong>Entropy</strong><span>{% if taxonomy.max_ent != None %}{% if taxonomy.max_ent == taxonomy.min_ent %}{{ taxonomy.max_ent|floatformat:2 }}{% else %}{{ taxonomy.min_ent|floatformat:2 }} - {{ taxonomy.max_ent|floatformat:2 }}{% endif %}{% else %} - {% endif %}</span></div>
+            <div class="stat-card"><strong>Collection Dates</strong><span style="font-size: 1rem;">{% if taxonomy.first_collection %}{% if taxonomy.first_collection == taxonomy.last_collection %}{{ taxonomy.first_collection }}{% else %}{{ taxonomy.first_collection }} to {{ taxonomy.last_collection }}{% endif %}{% else %} - {% endif %}</span></div>
         </div>
         
-        <div class="pdf-section">
-            <strong style="color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Visualizations:</strong>
-            <a href="/static/charts/{{ taxonomy.species }}_gc.pdf" target="_blank" class="pdf-link">GC Profile PDF</a>
-            <a href="/static/charts/{{ taxonomy.species }}_entropy.pdf" target="_blank" class="pdf-link">Entropy Profile PDF</a>
+        <h3>Analysis Visualizations</h3>
+        
+        {% if graphs_exist.length or graphs_exist.gc or graphs_exist.entropy or graphs_exist.melting_temp or graphs_exist.bases_tempo %}
+        <div class="graph-buttons">
+            {% if graphs_exist.length %}
+            <a href="{% url 'download_graph' taxonomy.id 'length' %}" class="btn-download">📄 Length Distribution</a>
+            {% endif %}
+            
+            {% if graphs_exist.gc %}
+            <a href="{% url 'download_graph' taxonomy.id 'gc' %}" class="btn-download">📄 GC Content</a>
+            {% endif %}
+
+            {% if graphs_exist.entropy %}
+            <a href="{% url 'download_graph' taxonomy.id 'entropy' %}" class="btn-download">📄 Entropy</a>
+            {% endif %}
+
+            {% if graphs_exist.melting_temp %}
+            <a href="{% url 'download_graph' taxonomy.id 'melting_temp' %}" class="btn-download">📄 Melting Temperature</a>
+            {% endif %}
+
+            {% if graphs_exist.bases_tempo %}
+            <a href="{% url 'download_graph' taxonomy.id 'bases_tempo' %}" class="btn-download">📄 Bases Over Time</a>
+            {% endif %}
         </div>
+        {% else %}
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+            </svg>
+            <p>No visualizations available</p>
+        </div>
+        {% endif %}
 
         <h3>Individual Sequences ({{ taxonomy.sequence_count }})</h3>
         
