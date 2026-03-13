@@ -1,19 +1,26 @@
 const BASE = '/api'
 
-export async function fetchSpecies(search = '') {
-  const res = await fetch(`${BASE}/especies/?search=${encodeURIComponent(search)}`)
-  if (!res.ok) throw new Error('Failed to fetch species')
-  return res.json()
-}
+export const api = {
+  home: () =>
+    fetch(`${BASE}/`).then(r => r.json()),
 
-export async function fetchAutocomplete(query) {
-  const res = await fetch(`${BASE}/autocomplete/?q=${encodeURIComponent(query)}`)
-  if (!res.ok) throw new Error('Failed to fetch autocomplete')
-  return res.json()
-}
+  speciesList: (params = {}) => {
+    const qs = new URLSearchParams(params).toString()
+    return fetch(`${BASE}/especies/?${qs}`).then(r => r.json())
+  },
 
-export async function fetchSpeciesDetail(taxonomyId) {
-  const res = await fetch(`${BASE}/${taxonomyId}/`)
-  if (!res.ok) throw new Error('Failed to fetch species detail')
-  return res.json()
+  autocomplete: (q) =>
+    fetch(`${BASE}/autocomplete/?q=${encodeURIComponent(q)}`).then(r => r.json()),
+
+  speciesDetail: async (id, params = {}) => {
+    const qs = new URLSearchParams(params).toString()
+    const r = await fetch(`${BASE}/${id}/?${qs}`)
+    return await r.json()
+  },
+
+  downloadGlobalFasta:    () => window.location.href = `${BASE}/download-fasta-global/`,
+  downloadGlobalMetadata: () => window.location.href = `${BASE}/download-metadata-global/`,
+  downloadSpeciesZip:     (id) => window.location.href = `${BASE}/${id}/download-zip/`,
+  downloadGraph:          (id, type) => window.location.href = `${BASE}/${id}/download/${type}/`,
+  downloadCncbFasta:      (accession) => window.location.href = `${BASE}/download-fasta-cncb/${accession}/`,
 }

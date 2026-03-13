@@ -1,97 +1,130 @@
-import { useState, useEffect } from 'react'
-import { fetchSpecies, fetchAutocomplete } from '../api/genomes'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { api } from '../api/genomes'
+import Pagination from '../components/Pagination'
+import '../styles/species-list.css'
 
-export default function SpeciesList() {
-  const [species, setSpecies] = useState([])
-  const [query, setQuery] = useState('')
+const DownloadIcon = () => (
+  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+  </svg>
+)
+
+export default function SpeciesList({ onNavigate, initialQuery = '' }) {
+  const [data, setData] = useState(null)
+  const [query, setQuery] = useState(initialQuery)
+  const [inputVal, setInputVal] = useState(initialQuery)
   const [suggestions, setSuggestions] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [sort, setSort] = useState('frequency')
+  const [page, setPage] = useState(1)
+  const wrapperRef = useRef(null)
+
+  const load = useCallback(() => {
+    api.speciesList({ q: query, sort, page }).then(setData)
+  }, [query, sort, page])
+
+  useEffect(() => { load() }, [load])
 
   useEffect(() => {
-    setLoading(true)
-    fetchSpecies()
-      .then(setSpecies)
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false))
+    if (inputVal.length < 2) { setSuggestions([]); return }
+    api.autocomplete(inputVal).then(setSuggestions)
+  }, [inputVal])
+
+  useEffect(() => {
+    const handler = (e) => { if (!wrapperRef.current?.contains(e.target)) setSuggestions([]) }
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
   }, [])
 
-  useEffect(() => {
-    if (query.length < 2) { setSuggestions([]); return }
-    fetchAutocomplete(query).then(setSuggestions).catch(console.error)
-  }, [query])
+  function submitSearch(val) {
+    setQuery(val)
+    setInputVal(val)
+    setSuggestions([])
+    setPage(1)
+  }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 flex flex-col gap-6">
-      <h1>Species</h1>
+    <div className="list-container">
+      <div className="back-nav">
+        <button onClick={() => onNavigate('home')}>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Back to Home
+        </button>
+      </div>
 
-      <div className="relative">
-        <input
-          type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Search species..."
-          className="w-full px-4 py-2 rounded-lg"
-          style={{ border: '1px solid var(--border)', background: 'var(--code-bg)', color: 'var(--text-h)' }}
-        />
-        {suggestions.length > 0 && (
-          <ul
-            className="absolute w-full rounded-lg mt-1 z-10 overflow-hidden"
-            style={{ border: '1px solid var(--border)', background: 'var(--bg)', boxShadow: 'var(--shadow)' }}
-          >
-            {suggestions.map(s => (
-              <li
-                key={s.taxonomy_id}
-                onClick={() => { setQuery(s.name); setSuggestions([]) }}
-                className="px-4 py-2 cursor-pointer hover:opacity-80"
-                style={{ color: 'var(--text-h)' }}
-              >
-                {s.name}
-              </li>
+      <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 8px', letterSpacing: '-0.03em' }}>
+        Species Database
+      </h1>
+
+      {data && (
+        <div className="stats-badge" style={{ marginBottom: 24 }}>
+          <span>Total Species <strong>{data.total_species.toLocaleString()}</strong></span>
+          <span>Total Sequences <strong>{data.total_sequences.toLocaleString()}</strong></span>
+        </div>
+      )}
+
+      <div className="controls-wrapper">
+        <div className="sorting-controls">
+          <span>Sort by</span>
+          {[['frequency', 'Most Frequent'], ['az', 'A–Z']].map(([val, label]) => (
+            <button key={val} className={`sort-btn ${sort === val ? 'active' : ''}`}
+              onClick={() => { setSort(val); setPage(1) }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="right-controls">
+          <button className="btn btn-primary-solid" onClick={api.downloadGlobalMetadata}>
+            <DownloadIcon /> CSV
+          </button>
+          <button className="btn btn-success" onClick={api.downloadGlobalFasta}>
+            <DownloadIcon /> FASTA
+          </button>
+          <div className="search-form" ref={wrapperRef} style={{ position: 'relative' }}>
+            <input
+              type="text"
+              value={inputVal}
+              onChange={e => setInputVal(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && submitSearch(inputVal)}
+              placeholder="Search species..."
+              autoComplete="off"
+            />
+            {suggestions.length > 0 && (
+              <div className="suggestions-dropdown">
+                {suggestions.map(s => (
+                  <div key={s.id} className="suggestion-item" onClick={() => submitSearch(s.species)}>
+                    {s.species}
+                  </div>
+                ))}
+              </div>
+            )}
+            <button className="btn btn-primary-solid" onClick={() => submitSearch(inputVal)}>Search</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Species</th><th>Family</th><th>Genus</th><th>Sequences</th></tr>
+          </thead>
+          <tbody>
+            {data?.results.length === 0 ? (
+              <tr><td colSpan="4" className="empty-state">No species found.</td></tr>
+            ) : data?.results.map(s => (
+              <tr key={s.id}>
+                <td><button style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, color: '#1e293b', padding: 0 }} onClick={() => onNavigate('detail', s.id)}><em>{s.species}</em></button></td>
+                <td>{s.family || '-'}</td>
+                <td>{s.genus || '-'}</td>
+                <td style={{ fontWeight: 500 }}>{s.sequence_count.toLocaleString()}</td>
+              </tr>
             ))}
-          </ul>
-        )}
+          </tbody>
+        </table>
       </div>
 
-      {loading && <p style={{ color: 'var(--text)' }}>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-
-      <ul className="flex flex-col gap-3">
-        {species.map(s => (
-          <li
-            key={s.taxonomy_id}
-            className="flex justify-between items-center p-4 rounded-xl"
-            style={{ border: '1px solid var(--border)' }}
-          >
-            <span style={{ color: 'var(--text-h)' }}>{s.name}</span>
-            <div className="flex gap-2">
-              <a
-                href={`/api/${s.taxonomy_id}/`}
-                className="px-3 py-1 rounded-full text-sm"
-                style={{ background: 'var(--accent-bg)', color: 'var(--accent)', border: '1px solid var(--accent-border)' }}
-              >
-                View
-              </a>
-              <a
-                href={`/api/${s.taxonomy_id}/download-zip/`}
-                className="px-3 py-1 rounded-full text-sm"
-                style={{ background: 'var(--code-bg)', color: 'var(--text)' }}
-              >
-                ↓ ZIP
-              </a>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex gap-3 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-        <a href="/api/download-fasta-global/" className="px-4 py-2 rounded-lg text-sm" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>
-          ↓ Download all FASTA
-        </a>
-        <a href="/api/download-metadata-global/" className="px-4 py-2 rounded-lg text-sm" style={{ background: 'var(--code-bg)', color: 'var(--text)' }}>
-          ↓ Download all Metadata
-        </a>
-      </div>
+      <Pagination page={page} totalPages={data?.total_pages ?? 1} onPage={setPage} />
     </div>
   )
 }
