@@ -22,3 +22,16 @@ data/
 *.csvs
 *.pdf
 graphs/
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+docker-compose.override.yml

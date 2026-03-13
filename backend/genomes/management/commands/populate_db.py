@@ -50,12 +50,15 @@ class Command(BaseCommand):
                             pass
 
                 sequences_to_create.append(Sequence(
-                    accession=row['accession'].strip(),
+                    accession=row.get('accession_id', '').strip(),
                     taxonomy=tax,
                     organism_name=row.get('organism_name', '').strip(),
                     country=row.get('country', '').strip(),
                     collection_date=dt_obj,
-                    source_db=row.get('source', '').strip()
+                    source_db=row.get('source', '').strip(),
+                    genome_id=row.get('genome_id', '').strip(),
+                    molecular_type=row.get('molecular_type', '').strip(),
+                    completeness_flag=row.get('completeness_flag', '').strip()
                 ))
 
                 if len(sequences_to_create) >= batch_size:
@@ -107,13 +110,10 @@ class Command(BaseCommand):
             calc_max_len=Max('sequences__metrics__length'),
             calc_min_gc=Min('sequences__metrics__gc_content'),
             calc_max_gc=Max('sequences__metrics__gc_content'),
-            
-            # ADD THESE 4 LINES
             calc_min_mt=Min('sequences__metrics__melting_temp'),
             calc_max_mt=Max('sequences__metrics__melting_temp'),
             calc_min_ent=Min('sequences__metrics__entropy'),
             calc_max_ent=Max('sequences__metrics__entropy'),
-            
             calc_first_date=Min('sequences__collection_date'),
             calc_last_date=Max('sequences__collection_date')
         )
@@ -125,12 +125,10 @@ class Command(BaseCommand):
             t.max_length = t.calc_max_len
             t.min_gc = t.calc_min_gc
             t.max_gc = t.calc_max_gc
-            
             t.min_mt = t.calc_min_mt
             t.max_mt = t.calc_max_mt
             t.min_ent = t.calc_min_ent
             t.max_ent = t.calc_max_ent
-            
             t.first_collection = t.calc_first_date
             t.last_collection = t.calc_last_date
             taxs_to_update.append(t)
