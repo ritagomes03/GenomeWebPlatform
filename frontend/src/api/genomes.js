@@ -1,17 +1,36 @@
 const BASE = '/api'
-const get = (url) => fetch(url).then(r => { if (!r.ok) throw new Error(r.statusText); return r.json() })
+
+const get = (url) =>
+  fetch(url).then(r => {
+    if (!r.ok) throw new Error(r.statusText)
+    return r.json()
+  })
+
+const download = (url) => {
+  window.location.href = url
+}
 
 export const genomesApi = {
-  home:           ()         => get(`${BASE}/taxonomy/top/`),
-  taxonomy:       (params)   => get(`${BASE}/taxonomy/?${new URLSearchParams(params)}`),
-  autocomplete:   (q)        => get(`${BASE}/taxonomy/autocomplete/?q=${encodeURIComponent(q)}`),
-  detail:         (id)       => get(`${BASE}/taxonomy/${id}/`),
-  sequences:      (id, p)    => get(`${BASE}/taxonomy/${id}/sequences/?${new URLSearchParams(p)}`),
-  graphs:         (id)       => get(`${BASE}/taxonomy/${id}/graphs/`),
+  // Stats for the home page
+  home: () =>
+    get(`${BASE}/global/stats/`),
 
-  downloadZip:      (id)  => { window.location.href = `${BASE}/taxonomy/${id}/download/zip/` },
-  downloadGraph:    (id, type) => { window.location.href = `${BASE}/taxonomy/${id}/download/graph/${type}/` },
-  downloadFasta:    (acc) => { window.location.href = `${BASE}/sequences/${acc}/download/fasta/` },
-  downloadAllFasta: ()    => { window.location.href = `${BASE}/global/download/fasta/` },
-  downloadMetadata: ()    => { window.location.href = `${BASE}/global/download/metadata/` },
+  // Species list with optional sort, search and pagination
+  taxonomy: (params) =>
+    get(`${BASE}/taxonomy/?${new URLSearchParams(params)}`),
+
+  // Species name autocomplete
+  autocomplete: (q) =>
+    get(`${BASE}/taxonomy/autocomplete/?q=${encodeURIComponent(q)}`),
+
+  // Full species detail — includes sequences, graphs_exist, available_years
+  detail: (id, params = {}) =>
+    get(`${BASE}/taxonomy/${id}/?${new URLSearchParams(params)}`),
+
+  // Downloads
+  downloadZip:      (id)        => download(`${BASE}/taxonomy/${id}/download/`),
+  downloadGraph:    (id, type)  => download(`${BASE}/taxonomy/${id}/graph/?type=${type}`),
+  downloadFasta:    (accession) => download(`${BASE}/sequences/${accession}/fasta/`),
+  downloadAllFasta: ()          => download(`${BASE}/global/fasta/`),
+  downloadMetadata: ()          => download(`${BASE}/global/metadata/`),
 }

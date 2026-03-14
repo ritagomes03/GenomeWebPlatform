@@ -1,137 +1,146 @@
-import { useState, useEffect } from 'react'
-import { api } from '../api/genomes'
-import SequenceModal from '../components/SequenceModal'
-import Pagination from '../components/Pagination'
-import '../styles/species-detail.css'
+import { useState } from 'react'
+import { useTaxonomyDetail } from '../hooks/useGenomes'
+import { genomesApi } from '../api/genomes'
+import StatCard from '../components/species/StatCard'
+import GraphButtons from '../components/species/GraphButtons'
+import GraphPreviewCard from '../components/species/GraphPreviewCard'
+import SequencesTable from '../components/sequences/SequencesTable'
+import Pagination from '../components/ui/Pagination'
+import Spinner from '../components/ui/Spinner'
 
-const DownloadIcon = () => (
-  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
-  </svg>
-)
+function range(min, max, decimals = 0) {
+  if (min == null || max == null) return null
+  const fmt = v => (decimals ? Number(v).toFixed(decimals) : v)
+  return fmt(min) === fmt(max) ? `${fmt(min)}` : `${fmt(min)} – ${fmt(max)}`
+}
 
-export default function SpeciesDetail({ id, onNavigate }) {
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
-  const [year, setYear] = useState('')
-  const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState(null)
+export default function SpeciesDetail({ id, navigate }) {
+  const [year, setYear]         = useState('')
+  const [seqPage, setSeqPage]   = useState(1)
+  const [previews, setPreviews] = useState([])  // [{ key, label }]
 
-  useEffect(() => {
-    setData(null)
-    api.speciesDetail(id, { year, page })
-      .then(setData)
-      .catch(e => setError(e.message))
-  }, [id, year, page])
+  const { data: detail, isLoading, error }           = useTaxonomyDetail(id)
+  const { data: seqData, isLoading: seqLoading }     = useTaxonomyDetail(id, { year, page: seqPage })
 
-  if (error) return <pre style={{ color: 'red', padding: '2rem' }}>{error}</pre>
-  if (!data)  return <p style={{ padding: '2rem', color: '#64748b' }}>Loading...</p>
+  function handleYearChange(value) {
+    setYear(value)
+    setSeqPage(1)
+  }
 
-  const { taxonomy, sequences, graphs_exist, available_years, total_pages } = data
+  function togglePreview(key, label) {
+    setPreviews(prev =>
+      prev.find(p => p.key === key)
+        ? prev.filter(p => p.key !== key)
+        : [...prev, { key, label }]
+    )
+  }
+
+  if (isLoading) return <div className="min-h-screen bg-slate-50"><Spinner /></div>
+  if (error)     return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-red-500">Species not found.</div>
+
+  const tax      = detail?.taxonomy ?? detail
+  const hasGraphs = detail?.graphs_exist && Object.values(detail.graphs_exist).some(Boolean)
+  const sequences = seqData?.sequences ?? detail?.sequences ?? []
 
   return (
-    <div className="detail-container" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div className="min-h-screen bg-slate-50 font-[system-ui,-apple-system,sans-serif] text-slate-700 py-10 px-5">
+      <div className="max-w-[1100px] mx-auto">
 
-      {/* Back */}
-      <div className="back-nav">
-        <button onClick={() => onNavigate('list')}>
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
-          Back to Species List
-        </button>
-      </div>
-
-      {/* Header */}
-      <div style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: '#0f172a', margin: '0 0 12px', letterSpacing: '-0.03em' }}>
-          <em>{taxonomy.species}</em>
-        </h1>
-        <div className="taxonomy-badge">
-          <span>Family <strong>{taxonomy.family || '-'}</strong></span>
-          <span>Genus <strong>{taxonomy.genus || '-'}</strong></span>
+        {/* Back */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate('list')}
+            className="inline-flex items-center gap-1.5 text-blue-600 hover:underline font-medium bg-transparent border-none cursor-pointer p-0"
+          >
+            ← Back to Species List
+          </button>
         </div>
-      </div>
 
-      {/* Stat cards */}
-      <div className="stats-grid">
-        {[
-          ['Length (bp)', `${taxonomy.min_length ?? '-'} – ${taxonomy.max_length ?? '-'}`],
-          ['GC Content', `${taxonomy.min_gc?.toFixed(2) ?? '-'} – ${taxonomy.max_gc?.toFixed(2) ?? '-'}`],
-          ['Melting Temp °C', `${taxonomy.min_mt?.toFixed(2) ?? '-'} – ${taxonomy.max_mt?.toFixed(2) ?? '-'}`],
-          ['Entropy', `${taxonomy.min_ent?.toFixed(4) ?? '-'} – ${taxonomy.max_ent?.toFixed(4) ?? '-'}`],
-        ].map(([label, val]) => (
-          <div key={label} className="stat-card">
-            <strong>{label}</strong>
-            <span>{val}</span>
+        {/* Header */}
+        <h1 className="text-[2.2rem] font-bold text-slate-900 m-0 mb-2 italic">{tax?.species}</h1>
+        <p className="text-slate-500 text-[1.05rem] mb-8">
+          Family: <strong>{tax?.family ?? '—'}</strong> &bull; Genus: <strong>{tax?.genus ?? '—'}</strong>
+        </p>
+
+        {/* Stats */}
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8">
+          <StatCard label="Length (bp)"       value={range(tax?.min_length, tax?.max_length)} />
+          <StatCard label="GC Content (%)"    value={range(tax?.min_gc, tax?.max_gc, 2)} />
+          <StatCard label="Melting Temp (°C)" value={range(tax?.min_mt, tax?.max_mt, 2)} />
+          <StatCard label="Entropy"           value={range(tax?.min_ent, tax?.max_ent, 2)} />
+          <StatCard
+            label="Collection Dates"
+            value={
+              tax?.first_collection
+                ? tax.first_collection === tax.last_collection
+                  ? tax.first_collection
+                  : `${tax.first_collection} to ${tax.last_collection}`
+                : null
+            }
+          />
+        </div>
+
+        {/* Visualizations */}
+        <h3 className="text-[1.5rem] font-bold text-slate-900 mb-4">Analysis Visualizations</h3>
+        {hasGraphs ? (
+          <>
+            <GraphButtons
+              taxonomyId={id}
+              graphsExist={detail.graphs_exist}
+              openKeys={previews.map(p => p.key)}
+              onToggle={togglePreview}
+            />
+            {previews.length > 0 && (
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(450px,1fr))] gap-5 mt-6">
+                {previews.map(({ key, label }) => (
+                  <GraphPreviewCard
+                    key={key}
+                    taxonomyId={id}
+                    graphKey={key}
+                    label={label}
+                    onClose={() => togglePreview(key, label)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="bg-white border border-dashed border-slate-300 rounded-xl p-10 text-center text-slate-500 mb-8">
+            <p className="font-medium mb-2">No visualizations available for this species.</p>
+            <p className="m-0 text-[0.95rem]">
+              <em>Visualizations are only generated for species with 4 or more sequences (currently has {tax?.sequence_count}).</em>
+            </p>
           </div>
-        ))}
-      </div>
+        )}
 
-      {/* Sequences header + download */}
-      <div className="section-header">
-        <h3>Individual Sequences <span style={{ color: '#64748b', fontWeight: 400, fontSize: '1rem' }}>({taxonomy.sequence_count?.toLocaleString()})</span></h3>
-        <button className="btn-primary" onClick={() => api.downloadSpeciesZip(id)}>
-          <DownloadIcon /> Download Species ZIP
-        </button>
-      </div>
-
-      {/* Year filter */}
-      {available_years.length > 0 && (
-        <div className="year-filters">
-          <span style={{ color: '#64748b', fontSize: '0.9rem' }}>Filter:</span>
-          <button className={`year-btn ${!year ? 'active' : ''}`} onClick={() => { setYear(''); setPage(1) }}>All</button>
-          {available_years.map(y => (
-            <button key={y} className={`year-btn ${year == y ? 'active' : ''}`} onClick={() => { setYear(y); setPage(1) }}>{y}</button>
-          ))}
+        {/* Sequences header */}
+        <div className="flex justify-between items-center flex-wrap gap-4 mt-10 mb-4">
+          <h3 className="text-[1.5rem] font-bold text-slate-900 m-0">
+            Individual Sequences ({tax?.sequence_count?.toLocaleString()})
+          </h3>
+          <button
+            onClick={() => genomesApi.downloadZip(id)}
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-[18px] py-2.5 rounded-lg font-medium text-[0.95rem] transition-colors border-none cursor-pointer"
+          >
+            ↓ Download Sequences (ZIP)
+          </button>
         </div>
-      )}
 
-      {/* Table */}
-      <div className="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Accession</th><th>Country</th><th>Date</th>
-              <th>Length</th><th>GC %</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sequences.length === 0 ? (
-              <tr><td colSpan="6" className="empty-state">No sequences found.</td></tr>
-            ) : sequences.map(s => {
-              const isCncb = s.source_db?.toLowerCase().includes('cncb')
-              const isBvBrc = s.source_db?.toLowerCase().includes('bv-brc')
-              return (
-                <tr key={s.accession}>
-                  <td>
-                    <button className="seq-trigger" onClick={() => setSelected(s)}>{s.accession}</button>
-                  </td>
-                  <td>{s.country || '-'}</td>
-                  <td>{s.collection_date || '-'}</td>
-                  <td>{s.length ?? '-'}</td>
-                  <td>{s.gc_content?.toFixed(2) ?? '-'}</td>
-                  <td>
-                    {isCncb && (
-                      <button className="btn-link" onClick={() => api.downloadCncbFasta(s.accession)}>↓ FASTA</button>
-                    )}
-                    {isBvBrc && (
-                      <a className="btn-link" href={`https://www.bv-brc.org/view/Genome/${s.genome_id}`} target="_blank" rel="noopener noreferrer">BV-BRC ↗</a>
-                    )}
-                    {!isCncb && !isBvBrc && (
-                      <a className="btn-link" href={`https://www.ncbi.nlm.nih.gov/nuccore/${s.accession}`} target="_blank" rel="noopener noreferrer">NCBI ↗</a>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <SequencesTable
+          sequences={sequences}
+          loading={seqLoading}
+          availableYears={detail?.available_years}
+          year={year}
+          onYearChange={handleYearChange}
+        />
+
+        <Pagination
+          page={seqData?.page ?? 1}
+          numPages={seqData?.num_pages ?? 1}
+          onPageChange={setSeqPage}
+        />
+
       </div>
-
-      <Pagination page={page} totalPages={total_pages} onPage={setPage} />
-
-      {selected && <SequenceModal sequence={selected} onClose={() => setSelected(null)} />}
     </div>
   )
 }

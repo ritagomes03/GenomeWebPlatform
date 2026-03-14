@@ -10,8 +10,13 @@ export const useTaxonomy = (params) =>
 export const useAutocomplete = (q) =>
   useQuery({ queryKey: ['autocomplete', q], queryFn: () => genomesApi.autocomplete(q), enabled: q.length >= 2 })
 
-export const useTaxonomyDetail = (id) =>
-  useQuery({ queryKey: ['taxonomy', id], queryFn: () => genomesApi.detail(id), enabled: !!id })
+export const useTaxonomyDetail = (id, params = {}) =>
+  useQuery({
+    queryKey: ['taxonomy', id, params],
+    queryFn: () => genomesApi.detail(id, params),
+    enabled: !!id,
+  })
+
 
 export const useSequences = (id, params) =>
   useQuery({ queryKey: ['sequences', id, params], queryFn: () => genomesApi.sequences(id, params), enabled: !!id })

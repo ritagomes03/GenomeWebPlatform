@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import './App.css'
 import Home from './pages/Home'
 import SpeciesList from './pages/SpeciesList'
 import SpeciesDetail from './pages/SpeciesDetail'
 
 export default function App() {
-  const [page, setPage] = useState('home')
+  const [page, setPage]           = useState('home')
   const [selectedId, setSelectedId] = useState(null)
   const [initialQuery, setInitialQuery] = useState('')
 
@@ -13,23 +12,14 @@ export default function App() {
     setPage(target)
     setSelectedId(id)
     setInitialQuery(query)
+    window.scrollTo(0, 0)
   }
 
   return (
     <>
-      {page === 'home' && <Home onNavigate={navigate} />}
-      {page === 'list' && (
-        <SpeciesList
-          onNavigate={navigate}
-          initialQuery={initialQuery}
-        />
-      )}
-      {page === 'detail' && (
-        <SpeciesDetail
-          id={selectedId}
-          onNavigate={navigate}
-        />
-      )}
+      {page === 'home'   && <Home navigate={navigate} />}
+      {page === 'list'   && <SpeciesList navigate={navigate} initialQuery={initialQuery} />}
+      {page === 'detail' && <SpeciesDetail id={selectedId} navigate={navigate} />}
     </>
   )
 }
