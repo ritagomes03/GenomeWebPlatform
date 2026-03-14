@@ -1,26 +1,17 @@
 const BASE = '/api'
+const get = (url) => fetch(url).then(r => { if (!r.ok) throw new Error(r.statusText); return r.json() })
 
-export const api = {
-  home: () =>
-    fetch(`${BASE}/`).then(r => r.json()),
+export const genomesApi = {
+  home:           ()         => get(`${BASE}/taxonomy/top/`),
+  taxonomy:       (params)   => get(`${BASE}/taxonomy/?${new URLSearchParams(params)}`),
+  autocomplete:   (q)        => get(`${BASE}/taxonomy/autocomplete/?q=${encodeURIComponent(q)}`),
+  detail:         (id)       => get(`${BASE}/taxonomy/${id}/`),
+  sequences:      (id, p)    => get(`${BASE}/taxonomy/${id}/sequences/?${new URLSearchParams(p)}`),
+  graphs:         (id)       => get(`${BASE}/taxonomy/${id}/graphs/`),
 
-  speciesList: (params = {}) => {
-    const qs = new URLSearchParams(params).toString()
-    return fetch(`${BASE}/especies/?${qs}`).then(r => r.json())
-  },
-
-  autocomplete: (q) =>
-    fetch(`${BASE}/autocomplete/?q=${encodeURIComponent(q)}`).then(r => r.json()),
-
-  speciesDetail: async (id, params = {}) => {
-    const qs = new URLSearchParams(params).toString()
-    const r = await fetch(`${BASE}/${id}/?${qs}`)
-    return await r.json()
-  },
-
-  downloadGlobalFasta:    () => window.location.href = `${BASE}/download-fasta-global/`,
-  downloadGlobalMetadata: () => window.location.href = `${BASE}/download-metadata-global/`,
-  downloadSpeciesZip:     (id) => window.location.href = `${BASE}/${id}/download-zip/`,
-  downloadGraph:          (id, type) => window.location.href = `${BASE}/${id}/download/${type}/`,
-  downloadCncbFasta:      (accession) => window.location.href = `${BASE}/download-fasta-cncb/${accession}/`,
+  downloadZip:      (id)  => { window.location.href = `${BASE}/taxonomy/${id}/download/zip/` },
+  downloadGraph:    (id, type) => { window.location.href = `${BASE}/taxonomy/${id}/download/graph/${type}/` },
+  downloadFasta:    (acc) => { window.location.href = `${BASE}/sequences/${acc}/download/fasta/` },
+  downloadAllFasta: ()    => { window.location.href = `${BASE}/global/download/fasta/` },
+  downloadMetadata: ()    => { window.location.href = `${BASE}/global/download/metadata/` },
 }

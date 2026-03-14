@@ -17,9 +17,19 @@ export default function App() {
 
   return (
     <>
-      {page === 'home'   && <Home onNavigate={navigate} />}
-      {page === 'list'   && <SpeciesList onNavigate={navigate} initialQuery={initialQuery} />}
-      {page === 'detail' && <SpeciesDetail id={selectedId} onNavigate={navigate} />}
+      {page === 'home' && <Home onNavigate={navigate} />}
+      {page === 'list' && (
+        <SpeciesList
+          onNavigate={navigate}
+          initialQuery={initialQuery}
+        />
+      )}
+      {page === 'detail' && (
+        <SpeciesDetail
+          id={selectedId}
+          onNavigate={navigate}
+        />
+      )}
     </>
   )
 }
