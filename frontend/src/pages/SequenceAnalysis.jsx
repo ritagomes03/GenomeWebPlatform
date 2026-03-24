@@ -113,7 +113,10 @@ export default function SequenceAnalysis() {
 
       <nav className="bg-[#0b1326]/80 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-700/20 shadow-[0_0_40px_rgba(218,226,253,0.06)]">
         <div className="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
-          <div className="text-2xl font-bold tracking-tight text-slate-100 font-[Space_Grotesk,system-ui,sans-serif]">
+          <div 
+            onClick={() => navigate('/')} 
+            className="text-2xl font-bold tracking-tight text-slate-100 font-[Space_Grotesk,system-ui,sans-serif] cursor-pointer hover:opacity-80 transition-opacity"
+          >
             ViromeGenomics
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -122,30 +125,38 @@ export default function SequenceAnalysis() {
             <button onClick={() => navigate('/species')} className="text-slate-400 hover:text-slate-100 transition-colors">Taxonomy</button>
             <button className="text-slate-400 hover:text-slate-100 transition-colors">Documentation</button>
           </div>
-          <button onClick={() => navigate('/')} className="text-sm text-slate-400 hover:text-cyan-400 transition-colors">← Back to Home</button>
+          <div className="w-24"></div>
         </div>
       </nav>
 
       <main className="relative overflow-hidden">
-        <section className="relative px-8 pt-20 pb-16 overflow-hidden">
+        <section className="relative px-8 pt-16 pb-12 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <img src="/virus-750.jpg" alt="" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] object-cover rounded-full opacity-25 blur-[1px] scale-110" />
             <div className="absolute inset-0 bg-[#0b1326]/72" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,220,229,0.08)_0%,rgba(11,19,38,0.88)_76%)]" />
           </div>
-          <div className="relative z-10 max-w-5xl mx-auto text-center">
+          
+          <div className="relative z-10 max-w-screen-2xl mx-auto">
+            <div className="mb-6">
+              <button
+                onClick={() => navigate('/')}
+                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+              >
+                <BackIcon /> Back to Home
+              </button>
+            </div>
+
             <h1 className="font-[Space_Grotesk,system-ui,sans-serif] text-4xl md:text-6xl font-bold tracking-tighter text-slate-100 mb-4 leading-[1.1]">
               Sequence Analysis
             </h1>
-            <p className="text-slate-400 text-lg max-w-3xl mx-auto">
+            <p className="text-slate-400 text-lg max-w-3xl">
               Upload a FASTA file to calculate sequence length, base composition, GC content and melting temperature.
             </p>
           </div>
         </section>
 
         <section className="max-w-screen-xl mx-auto px-8 pb-20 relative z-10 space-y-6">
-
-          {/* ── Upload card ───────────────────────────────────────── */}
           <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/30 shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
             <h2 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold text-slate-100 mb-1">
               Analyze FASTA File
@@ -154,7 +165,6 @@ export default function SequenceAnalysis() {
               Supported formats: <span className="text-cyan-400">.fasta .fa .fna .ffn .faa .frn .txt</span>
             </p>
 
-            {/* ── Field picker ──────────────────────────────────── */}
             <div className="mb-8">
               <p className="text-sm font-semibold text-slate-300 mb-1">
                 Header Metadata Order
@@ -165,8 +175,6 @@ export default function SequenceAnalysis() {
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* Available fields */}
                 <div className="bg-slate-900/60 rounded-xl border border-slate-700/40 p-4">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
                     Available fields
@@ -188,7 +196,6 @@ export default function SequenceAnalysis() {
                   )}
                 </div>
 
-                {/* Selected fields in order */}
                 <div className="bg-slate-900/60 rounded-xl border border-slate-700/40 p-4">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
                     Selected order {selectedFields.length > 0 && <span className="text-slate-600 normal-case font-normal">(matches | columns in header)</span>}
@@ -240,7 +247,6 @@ export default function SequenceAnalysis() {
                 </div>
               </div>
 
-              {/* Live preview of meta_order string */}
               {selectedFields.length > 0 && (
                 <div className="mt-3 flex items-center gap-2">
                   <span className="text-xs text-slate-600 uppercase tracking-wide shrink-0">Resolved order:</span>
@@ -251,7 +257,6 @@ export default function SequenceAnalysis() {
               )}
             </div>
 
-            {/* ── File input ────────────────────────────────────── */}
             <div className="space-y-4">
               <label className="block">
                 <span className="sr-only">Choose FASTA file</span>
@@ -282,7 +287,7 @@ export default function SequenceAnalysis() {
                 className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                   loading || !file
                     ? 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
-                    : 'bg-gradient-to-br from-purple-400 to-purple-600 text-white hover:brightness-110 shadow-lg'
+                    : 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-slate-950 hover:brightness-110 shadow-lg'
                 }`}
               >
                 {loading ? 'Analyzing…' : 'Analyze File'}
@@ -296,10 +301,8 @@ export default function SequenceAnalysis() {
             )}
           </div>
 
-          {/* ── Spinner ───────────────────────────────────────────── */}
           {loading && <div className="py-12"><Spinner /></div>}
 
-          {/* ── Results ───────────────────────────────────────────── */}
           {results && results.length > 0 && (
             <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/30 shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8 overflow-hidden">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
@@ -367,9 +370,16 @@ export default function SequenceAnalysis() {
               No results were returned for this file.
             </div>
           )}
-
         </section>
       </main>
     </div>
+  )
+}
+
+function BackIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+    </svg>
   )
 }

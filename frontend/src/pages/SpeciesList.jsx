@@ -82,8 +82,8 @@ export default function SpeciesList() {
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <button
-              onClick={() => navigate('/species')}
-              className="text-cyan-400 border-b-2 border-cyan-400 pb-1"
+              onClick={() => navigate('/repository')}
+              className="text-slate-400 hover:text-slate-100 transition-colors"
             >
               Repository
             </button>
@@ -97,7 +97,7 @@ export default function SpeciesList() {
 
             <button
               onClick={() => navigate('/species')}
-              className="text-slate-400 hover:text-slate-100 transition-colors"
+              className="text-cyan-400 border-b-2 border-cyan-400 pb-1"
             >
               Taxonomy
             </button>
@@ -106,13 +106,9 @@ export default function SpeciesList() {
               Documentation
             </button>
           </div>
-
-          <button
-            onClick={() => navigate('/')}
-            className="text-sm text-slate-400 hover:text-cyan-400 transition-colors"
-          >
-            ← Back to Home
-          </button>
+          
+          {/* O espaço vazio aqui ajuda a manter o menu centrado devido ao flex justify-between */}
+          <div className="w-24"></div> 
         </div>
       </nav>
 
