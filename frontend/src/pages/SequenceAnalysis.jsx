@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { genomesApi } from '../api/genomes'
 import Spinner from '../components/ui/Spinner'
+import { ThemeToggle } from '../components/ui/ThemeToggle'
+
 
 const FIELD_LABELS = {
   accession:        'Accession',
@@ -16,15 +18,16 @@ const FIELD_LABELS = {
   source:           'Source',
 }
 
+
 export default function SequenceAnalysis() {
   const navigate = useNavigate()
 
-  const [file, setFile]               = useState(null)
-  const [results, setResults]         = useState(null)
-  const [metaInfo, setMetaInfo]       = useState(null)
+  const [file, setFile]                 = useState(null)
+  const [results, setResults]           = useState(null)
+  const [metaInfo, setMetaInfo]         = useState(null)
   const [cleanedFasta, setCleanedFasta] = useState(null)
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState(null)
+  const [loading, setLoading]           = useState(false)
+  const [error, setError]               = useState(null)
 
   const [availableFields, setAvailableFields] = useState([])
   const [selectedFields, setSelectedFields]   = useState([])
@@ -48,8 +51,8 @@ export default function SequenceAnalysis() {
 
   const moveField = (index, direction) => {
     setSelectedFields(prev => {
-      const next  = [...prev]
-      const swap  = index + direction
+      const next = [...prev]
+      const swap = index + direction
       if (swap < 0 || swap >= next.length) return prev
       ;[next[index], next[swap]] = [next[swap], next[index]]
       return next
@@ -109,34 +112,50 @@ export default function SequenceAnalysis() {
   const unselected = availableFields.filter(f => !selectedFields.includes(f))
 
   return (
-    <div className="min-h-screen bg-[#0b1326] text-slate-100 font-[Manrope,system-ui,sans-serif]">
+    <div className="min-h-screen dark:bg-[#0b1326] bg-slate-50 dark:text-slate-100 text-slate-900 font-[Manrope,system-ui,sans-serif]">
 
-      <nav className="bg-[#0b1326]/80 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-700/20 shadow-[0_0_40px_rgba(218,226,253,0.06)]">
+      {/* NAVBAR */}
+      <nav className="dark:bg-[#0b1326]/80 bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b dark:border-slate-700/20 border-slate-200/50 shadow-[0_0_40px_rgba(218,226,253,0.06)]">
         <div className="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
-          <div 
-            onClick={() => navigate('/')} 
-            className="text-2xl font-bold tracking-tight text-slate-100 font-[Space_Grotesk,system-ui,sans-serif] cursor-pointer hover:opacity-80 transition-opacity"
+          <div
+            onClick={() => navigate('/')}
+            className="text-2xl font-bold tracking-tight dark:text-slate-100 text-slate-900 font-[Space_Grotesk,system-ui,sans-serif] cursor-pointer hover:opacity-80 transition-opacity"
           >
             ViromeGenomics
           </div>
+
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <button onClick={() => navigate('/species')} className="text-slate-400 hover:text-slate-100 transition-colors">Repository</button>
-            <button onClick={() => navigate('/analysis')} className="text-cyan-400 border-b-2 border-cyan-400 pb-1">Analysis</button>
-            <button onClick={() => navigate('/species')} className="text-slate-400 hover:text-slate-100 transition-colors">Taxonomy</button>
-            <button className="text-slate-400 hover:text-slate-100 transition-colors">Documentation</button>
+            <button onClick={() => navigate('/')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
+              Home
+            </button>
+            <button onClick={() => navigate('/species')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
+              Database
+            </button>
+            <button onClick={() => navigate('/analysis')} className="text-cyan-400 border-b-2 border-cyan-400 pb-1">
+              Analysis
+            </button>
+            <button onClick={() => navigate('/documentation')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
+              Documentation
+            </button>
           </div>
-          <div className="w-24"></div>
+
+          {/* TOGGLE */}
+          <div className="w-24 flex justify-end">
+            <ThemeToggle />
+          </div>
         </div>
       </nav>
 
       <main className="relative overflow-hidden">
+
+        {/* HERO */}
         <section className="relative px-8 pt-16 pb-12 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <img src="/virus-750.jpg" alt="" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] object-cover rounded-full opacity-25 blur-[1px] scale-110" />
-            <div className="absolute inset-0 bg-[#0b1326]/72" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,220,229,0.08)_0%,rgba(11,19,38,0.88)_76%)]" />
+            <img src="/virus-750.jpg" alt="" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] object-cover rounded-full dark:opacity-25 opacity-10 blur-[1px] scale-110" />
+            <div className="absolute inset-0 dark:bg-[#0b1326]/72 bg-slate-50/80" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,220,229,0.08)_0%,rgba(11,19,38,0.88)_76%)] dark:block hidden" />
           </div>
-          
+
           <div className="relative z-10 max-w-screen-2xl mx-auto">
             <div className="mb-6">
               <button
@@ -147,47 +166,52 @@ export default function SequenceAnalysis() {
               </button>
             </div>
 
-            <h1 className="font-[Space_Grotesk,system-ui,sans-serif] text-4xl md:text-6xl font-bold tracking-tighter text-slate-100 mb-4 leading-[1.1]">
+            <h1 className="font-[Space_Grotesk,system-ui,sans-serif] text-4xl md:text-6xl font-bold tracking-tighter dark:text-slate-100 text-slate-900 mb-4 leading-[1.1]">
               Sequence Analysis
             </h1>
-            <p className="text-slate-400 text-lg max-w-3xl">
+            <p className="dark:text-slate-400 text-slate-500 text-lg max-w-3xl">
               Upload a FASTA file to calculate sequence length, base composition, GC content and melting temperature.
             </p>
           </div>
         </section>
 
+        {/* MAIN CONTENT */}
         <section className="max-w-screen-xl mx-auto px-8 pb-20 relative z-10 space-y-6">
-          <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/30 shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8">
-            <h2 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold text-slate-100 mb-1">
+
+          {/* UPLOAD CARD */}
+          <div className="dark:bg-slate-800/95 bg-white backdrop-blur-xl rounded-2xl border dark:border-slate-700/30 border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-8">
+            <h2 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold dark:text-slate-100 text-slate-900 mb-1">
               Analyze FASTA File
             </h2>
-            <p className="text-slate-400 mb-8">
+            <p className="dark:text-slate-400 text-slate-500 mb-8">
               Supported formats: <span className="text-cyan-400">.fasta .fa .fna .ffn .faa .frn .txt</span>
             </p>
 
+            {/* METADATA ORDER */}
             <div className="mb-8">
-              <p className="text-sm font-semibold text-slate-300 mb-1">
+              <p className="text-sm font-semibold dark:text-slate-300 text-slate-700 mb-1">
                 Header Metadata Order
               </p>
-              <p className="text-xs text-slate-500 uppercase tracking-wide mb-4">
+              <p className="text-xs dark:text-slate-500 text-slate-400 uppercase tracking-wide mb-4">
                 Click fields to add them. Each field maps to a pipe-separated column in your FASTA headers.
                 Leave empty to skip header parsing.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-900/60 rounded-xl border border-slate-700/40 p-4">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                {/* Available fields */}
+                <div className="dark:bg-slate-900/60 bg-slate-50 rounded-xl border dark:border-slate-700/40 border-slate-200 p-4">
+                  <p className="text-xs font-semibold dark:text-slate-500 text-slate-400 uppercase tracking-wide mb-3">
                     Available fields
                   </p>
                   {unselected.length === 0 ? (
-                    <p className="text-xs text-slate-600 italic">All fields selected.</p>
+                    <p className="text-xs dark:text-slate-600 text-slate-400 italic">All fields selected.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {unselected.map(field => (
                         <button
                           key={field}
                           onClick={() => addField(field)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/60 text-slate-300 border border-slate-600/40 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400/30 transition-all"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold dark:bg-slate-700/60 bg-slate-200 dark:text-slate-300 text-slate-600 border dark:border-slate-600/40 border-slate-300 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400/30 transition-all"
                         >
                           + {FIELD_LABELS[field] ?? field}
                         </button>
@@ -196,21 +220,22 @@ export default function SequenceAnalysis() {
                   )}
                 </div>
 
-                <div className="bg-slate-900/60 rounded-xl border border-slate-700/40 p-4">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-                    Selected order {selectedFields.length > 0 && <span className="text-slate-600 normal-case font-normal">(matches | columns in header)</span>}
+                {/* Selected fields */}
+                <div className="dark:bg-slate-900/60 bg-slate-50 rounded-xl border dark:border-slate-700/40 border-slate-200 p-4">
+                  <p className="text-xs font-semibold dark:text-slate-500 text-slate-400 uppercase tracking-wide mb-3">
+                    Selected order {selectedFields.length > 0 && <span className="dark:text-slate-600 text-slate-400 normal-case font-normal">(matches | columns in header)</span>}
                   </p>
                   {selectedFields.length === 0 ? (
-                    <p className="text-xs text-slate-600 italic">No fields selected — headers will be ignored.</p>
+                    <p className="text-xs dark:text-slate-600 text-slate-400 italic">No fields selected — headers will be ignored.</p>
                   ) : (
                     <div className="space-y-1.5">
                       {selectedFields.map((field, i) => (
                         <div
                           key={field}
-                          className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700/40 group"
+                          className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg dark:bg-slate-800 bg-white border dark:border-slate-700/40 border-slate-200 group"
                         >
                           <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-xs font-bold text-slate-600 w-5 text-right shrink-0">{i + 1}</span>
+                            <span className="text-xs font-bold dark:text-slate-600 text-slate-400 w-5 text-right shrink-0">{i + 1}</span>
                             <span className="text-xs font-semibold text-cyan-400 truncate">
                               {FIELD_LABELS[field] ?? field}
                             </span>
@@ -219,26 +244,20 @@ export default function SequenceAnalysis() {
                             <button
                               onClick={() => moveField(i, -1)}
                               disabled={i === 0}
-                              className="p-1 rounded text-slate-500 hover:text-slate-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                              className="p-1 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
                               title="Move up"
-                            >
-                              ▲
-                            </button>
+                            >▲</button>
                             <button
                               onClick={() => moveField(i, 1)}
                               disabled={i === selectedFields.length - 1}
-                              className="p-1 rounded text-slate-500 hover:text-slate-200 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                              className="p-1 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
                               title="Move down"
-                            >
-                              ▼
-                            </button>
+                            >▼</button>
                             <button
                               onClick={() => removeField(field)}
-                              className="p-1 rounded text-slate-500 hover:text-red-400 transition-colors"
+                              className="p-1 rounded dark:text-slate-500 text-slate-400 hover:text-red-400 transition-colors"
                               title="Remove"
-                            >
-                              ✕
-                            </button>
+                            >✕</button>
                           </div>
                         </div>
                       ))}
@@ -249,14 +268,15 @@ export default function SequenceAnalysis() {
 
               {selectedFields.length > 0 && (
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="text-xs text-slate-600 uppercase tracking-wide shrink-0">Resolved order:</span>
-                  <code className="text-xs text-purple-400 bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-700/40 truncate">
+                  <span className="text-xs dark:text-slate-600 text-slate-400 uppercase tracking-wide shrink-0">Resolved order:</span>
+                  <code className="text-xs text-purple-400 dark:bg-slate-900/60 bg-slate-100 px-3 py-1 rounded-lg border dark:border-slate-700/40 border-slate-200 truncate">
                     {metaOrder}
                   </code>
                 </div>
               )}
             </div>
 
+            {/* FILE INPUT */}
             <div className="space-y-4">
               <label className="block">
                 <span className="sr-only">Choose FASTA file</span>
@@ -264,19 +284,20 @@ export default function SequenceAnalysis() {
                   type="file"
                   accept=".fasta,.fa,.fna,.ffn,.faa,.frn,.txt"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-sm text-slate-400
+                  className="block w-full text-sm dark:text-slate-400 text-slate-500
                     file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0
                     file:text-sm file:font-semibold file:bg-cyan-400/10 file:text-cyan-400
                     hover:file:bg-cyan-400/20
-                    border border-dashed border-slate-600 rounded-xl p-4 bg-slate-900/40
+                    border border-dashed dark:border-slate-600 border-slate-300 rounded-xl p-4
+                    dark:bg-slate-900/40 bg-slate-50
                     cursor-pointer outline-none"
                 />
               </label>
 
               {file && (
-                <p className="text-sm text-slate-300">
+                <p className="text-sm dark:text-slate-300 text-slate-600">
                   Selected file: <span className="text-cyan-400 font-semibold">{file.name}</span>
-                  <span className="text-slate-600 ml-2">({(file.size / 1024).toFixed(1)} KB)</span>
+                  <span className="dark:text-slate-600 text-slate-400 ml-2">({(file.size / 1024).toFixed(1)} KB)</span>
                 </p>
               )}
 
@@ -303,14 +324,15 @@ export default function SequenceAnalysis() {
 
           {loading && <div className="py-12"><Spinner /></div>}
 
+          {/* RESULTS */}
           {results && results.length > 0 && (
-            <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/30 shadow-[0_10px_40px_rgba(0,0,0,0.25)] p-8 overflow-hidden">
+            <div className="dark:bg-slate-800/95 bg-white backdrop-blur-xl rounded-2xl border dark:border-slate-700/30 border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-8 overflow-hidden">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
                 <div>
-                  <h3 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold text-slate-100">
+                  <h3 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold dark:text-slate-100 text-slate-900">
                     Results
                   </h3>
-                  <p className="text-slate-400">
+                  <p className="dark:text-slate-400 text-slate-500">
                     Analysis output for {results.length} sequence{results.length !== 1 ? 's' : ''}.
                   </p>
                   {metaInfo && metaInfo.original_count > metaInfo.cleaned_count && (
@@ -337,26 +359,28 @@ export default function SequenceAnalysis() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-slate-700/30">
+              <div className="overflow-x-auto rounded-xl border dark:border-slate-700/30 border-slate-200">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                   <thead>
                     <tr>
                       {['Sequence ID','Length (bp)','GC (%)','A (%)','T (%)','C (%)','G (%)','Tm (°C)'].map(h => (
-                        <th key={h} className="p-4 bg-slate-900/70 text-slate-300 font-semibold border-b border-slate-700">{h}</th>
+                        <th key={h} className="p-4 dark:bg-slate-900/70 bg-slate-50 dark:text-slate-300 text-slate-600 font-semibold border-b dark:border-slate-700 border-slate-200">
+                          {h}
+                        </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {results.map((item, idx) => (
-                      <tr key={idx} className="border-b border-slate-700/20 hover:bg-slate-700/20 transition-colors">
-                        <td className="p-4 font-mono font-bold text-cyan-400">{item.id || <span className="text-slate-600 italic">—</span>}</td>
-                        <td className="p-4 text-slate-300">{item.length.toLocaleString()}</td>
-                        <td className="p-4 text-slate-300">{item.gc_content}</td>
-                        <td className="p-4 text-slate-300">{item.a_perc}</td>
-                        <td className="p-4 text-slate-300">{item.t_perc}</td>
-                        <td className="p-4 text-slate-300">{item.c_perc}</td>
-                        <td className="p-4 text-slate-300">{item.g_perc}</td>
-                        <td className="p-4 text-slate-300">{item.melting_temp}</td>
+                      <tr key={idx} className="border-b dark:border-slate-700/20 border-slate-100 dark:hover:bg-slate-700/20 hover:bg-slate-50 transition-colors">
+                        <td className="p-4 font-mono font-bold text-cyan-400">{item.id || <span className="dark:text-slate-600 text-slate-400 italic">—</span>}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.length.toLocaleString()}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.gc_content}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.a_perc}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.t_perc}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.c_perc}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.g_perc}</td>
+                        <td className="p-4 dark:text-slate-300 text-slate-600">{item.melting_temp}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -366,7 +390,7 @@ export default function SequenceAnalysis() {
           )}
 
           {results?.length === 0 && !loading && (
-            <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl border border-slate-700/30 p-8 text-center text-slate-400">
+            <div className="dark:bg-slate-800/95 bg-white backdrop-blur-xl rounded-2xl border dark:border-slate-700/30 border-slate-200 p-8 text-center dark:text-slate-400 text-slate-500">
               No results were returned for this file.
             </div>
           )}
@@ -375,6 +399,7 @@ export default function SequenceAnalysis() {
     </div>
   )
 }
+
 
 function BackIcon() {
   return (

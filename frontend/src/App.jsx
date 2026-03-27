@@ -4,6 +4,8 @@ import SpeciesList from './pages/SpeciesList'
 import SpeciesDetail from './pages/SpeciesDetail'
 import SequenceAnalysis from './pages/SequenceAnalysis'
 
+
+
 export default function App() {
   return (
     <BrowserRouter>

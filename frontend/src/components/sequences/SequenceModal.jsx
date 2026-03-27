@@ -3,79 +3,119 @@ import { useEffect } from 'react'
 const fmt = (val, dec = 2) => (val != null ? Number(val).toFixed(dec) : '—')
 
 export default function SequenceModal({ sequence, onClose }) {
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = ''
-    }
-  }, [onClose])
-
   if (!sequence) return null
 
   return (
-    <div
-      className="fixed inset-0 bg-slate-900/40 backdrop-blur-[4px] flex justify-center items-center z-50 transition-opacity"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white w-[90%] max-w-[650px] max-h-[90vh] rounded-[20px] shadow-2xl flex flex-col"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-          <h3 className="m-0 text-[1.25rem] text-slate-900 font-mono font-bold">{sequence.accession}</h3>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-opacity">
+      <div className="bg-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-500 overflow-hidden flex flex-col max-h-[90vh]">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-500 bg-slate-700 sticky top-0 z-10">
+          <h2 className="text-2xl font-bold text-white font-[Space_Grotesk,system-ui,sans-serif]">
+            {sequence.accession || sequence.genome_id || 'Sequence Details'}
+          </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer"
+            className="p-2 text-slate-200 hover:text-white hover:bg-slate-600 rounded-full transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto">
-          <h4 className="text-base text-blue-500 font-bold m-0 mb-4 border-b-2 border-blue-50 pb-2">General Information</h4>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8">
-            <InfoItem label="Organism Name" value={sequence.organism_name} />
-            <InfoItem label="Collection Date" value={sequence.collection_date} />
-            <InfoItem label="Country" value={sequence.country} />
-            <InfoItem label="Source DB" value={sequence.source_db} />
-            <InfoItem label="Genome ID" value={sequence.genome_id} />
-            <InfoItem label="Molecular Type" value={sequence.molecular_type} />
-            <InfoItem label="Completeness" value={sequence.completeness_flag} />
-          </div>
+        {/* Body */}
+        <div className="p-6 overflow-y-auto space-y-8 font-[Manrope,system-ui,sans-serif]">
+          
+          {/* General Information */}
+          <section>
+            <h3 className="text-cyan-300 text-lg font-bold mb-4 border-b border-slate-500 pb-2">
+              General Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Organism Name</div>
+                <div className="text-white text-[0.95rem]">{sequence.organism_name ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Collection Date</div>
+                <div className="text-white text-[0.95rem]">{sequence.collection_date ?? sequence.date ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Country</div>
+                <div className="text-white text-[0.95rem]">{sequence.country ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Source DB</div>
+                <div className="text-white text-[0.95rem]">{sequence.source_db ?? 'NCBI'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Genome ID</div>
+                <div className="text-white text-[0.95rem]">{sequence.genome_id ?? sequence.accession ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Molecular Type</div>
+                <div className="text-white text-[0.95rem]">{sequence.molecular_type ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Completeness</div>
+                <div className="text-white text-[0.95rem]">{sequence.completeness ?? '—'}</div>
+              </div>
+            </div>
+          </section>
 
-          <h4 className="text-base text-blue-500 font-bold m-0 mb-4 border-b-2 border-blue-50 pb-2">Sequence Metrics</h4>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8">
-            <InfoItem label="Length (bp)" value={sequence.metrics?.length} />
-            <InfoItem label="GC Content (%)" value={fmt(sequence.metrics?.gc_content)} />
-            <InfoItem label="Melting Temp (°C)" value={fmt(sequence.metrics?.melting_temp)} />
-            <InfoItem label="Entropy" value={fmt(sequence.metrics?.entropy, 4)} />
-          </div>
+          {/* Sequence Metrics */}
+          <section>
+            <h3 className="text-cyan-300 text-lg font-bold mb-4 border-b border-slate-500 pb-2">
+              Sequence Metrics
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Length (bp)</div>
+                <div className="text-white text-[0.95rem]">{sequence.length ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">GC Content (%)</div>
+                <div className="text-white text-[0.95rem]">{sequence.gc_content ?? sequence.gc ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Melting Temp (°C)</div>
+                <div className="text-white text-[0.95rem]">{sequence.melting_temp ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">Entropy</div>
+                <div className="text-white text-[0.95rem]">{sequence.entropy ?? '—'}</div>
+              </div>
+            </div>
+          </section>
 
-          <h4 className="text-base text-blue-500 font-bold m-0 mb-4 border-b-2 border-blue-50 pb-2">Nucleotide Composition</h4>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8">
-            <InfoItem label="% Adenine (A)" value={fmt(sequence.metrics?.pct_a)} />
-            <InfoItem label="% Cytosine (C)" value={fmt(sequence.metrics?.pct_c)} />
-            <InfoItem label="% Guanine (G)" value={fmt(sequence.metrics?.pct_g)} />
-            <InfoItem label="% Thymine (T)" value={fmt(sequence.metrics?.pct_t)} />
-          </div>
+          {/* Nucleotide Composition */}
+          <section>
+            <h3 className="text-cyan-300 text-lg font-bold mb-4 border-b border-slate-500 pb-2">
+              Nucleotide Composition
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">% Adenine (A)</div>
+                <div className="text-white text-[0.95rem]">{sequence.perc_a ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">% Cytosine (C)</div>
+                <div className="text-white text-[0.95rem]">{sequence.perc_c ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">% Guanine (G)</div>
+                <div className="text-white text-[0.95rem]">{sequence.perc_g ?? '—'}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-slate-300 mb-1 font-semibold">% Thymine (T)</div>
+                <div className="text-white text-[0.95rem]">{sequence.perc_t ?? '—'}</div>
+              </div>
+            </div>
+          </section>
+
         </div>
       </div>
-    </div>
-  )
-}
-
-function InfoItem({ label, value }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs text-slate-500 uppercase font-semibold tracking-wider">{label}</span>
-      <span className="text-[0.95rem] text-slate-900 font-medium break-words">{value ?? '—'}</span>
     </div>
   )
 }
