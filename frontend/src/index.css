@@ -8,6 +8,22 @@ body {
   overscroll-behavior-y: none;
 }
 
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Modo noturno no body */
 html.dark body {
   background-color: #0f172a;
@@ -31,6 +47,11 @@ html.dark body {
   color: white;
   border-color: #3b82f6;
   transform: translateY(-1px);
+}
+
+.pagination-btn:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
 }
 
 /* Pagination no modo noturno */

@@ -4,12 +4,12 @@ const fmt = (val, dec = 2) => (val != null ? Number(val).toFixed(dec) : '—')
 
 function SourceLink({ sourceDb, genomeId, accession }) {
   const db = sourceDb?.toLowerCase() ?? ''
-  const cls = "inline-flex items-center gap-1 bg-slate-50 text-blue-600 border border-slate-200 px-3 py-1.5 rounded-md text-[0.85rem] font-semibold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all no-underline"
+  const cls = "inline-flex items-center gap-1 bg-slate-50 text-blue-600 border border-slate-200 px-3 py-2 rounded-md text-[0.85rem] font-semibold hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all no-underline focus-visible:ring-2 focus-visible:ring-cyan-400"
 
   if (db.includes('bv-brc') || db.includes('bvbrc'))
-    return <a href={`https://www.bv-brc.org/view/Genome/${genomeId}`} target="_blank" rel="noreferrer" className={cls}>BV-BRC ↗</a>
+    return <a href={`https://www.bv-brc.org/view/Genome/${genomeId}`} target="_blank" rel="noreferrer" className={cls} aria-label={`Open ${accession} on BV-BRC in a new tab`}>BV-BRC ↗</a>
   if (db.includes('ncbi'))
-    return <a href={`https://www.ncbi.nlm.nih.gov/nuccore/${accession}`} target="_blank" rel="noreferrer" className={cls}>NCBI ↗</a>
+    return <a href={`https://www.ncbi.nlm.nih.gov/nuccore/${accession}`} target="_blank" rel="noreferrer" className={cls} aria-label={`Open ${accession} on NCBI in a new tab`}>NCBI ↗</a>
   return <span className="text-slate-400 text-[0.85rem]">—</span>
 }
 
@@ -18,20 +18,22 @@ export default function SequencesTable({ sequences, loading, availableYears, yea
 
   return (
     <div className="bg-white rounded-xl shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] border border-slate-200 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-left">
+      <div className="overflow-x-auto" aria-label="Individual sequences table wrapper">
+        <table className="w-full min-w-[920px] border-collapse text-left">
+          <caption className="sr-only">Individual sequences with metrics and source links</caption>
           <thead>
             <tr>
-              <th className={th}>Accession</th>
-              <th className={th}>Country</th>
-              <th className={th}>
+              <th scope="col" className={th}>Accession</th>
+              <th scope="col" className={th}>Country</th>
+              <th scope="col" className={th}>
                 <div className="flex items-center gap-2">
                   Date
                   {availableYears?.length > 0 && (
                     <select
                       value={year}
                       onChange={e => onYearChange(e.target.value)}
-                      className="px-2 py-1 rounded border border-slate-200 text-xs font-medium text-slate-700 bg-white cursor-pointer outline-none normal-case tracking-normal"
+                      aria-label="Filter sequences by collection year"
+                      className="px-2 py-1 rounded border border-slate-200 text-xs font-medium text-slate-700 bg-white cursor-pointer outline-none normal-case tracking-normal focus-visible:ring-2 focus-visible:ring-cyan-400"
                     >
                       <option value="">All Years</option>
                       {availableYears.map(y => (
@@ -42,7 +44,7 @@ export default function SequencesTable({ sequences, loading, availableYears, yea
                 </div>
               </th>
               {['Length', 'Entropy', '% GC', 'Melting Temp', 'Link'].map(h => (
-                <th key={h} className={th}>{h}</th>
+                <th key={h} scope="col" className={th}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -60,8 +62,9 @@ export default function SequencesTable({ sequences, loading, availableYears, yea
               <tr key={s.accession} className="border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onSequenceClick(s)}  // ← use the prop
-                    className="font-mono text-blue-600 font-semibold text-[0.95rem] bg-transparent border-none cursor-pointer p-0 underline decoration-transparent hover:decoration-blue-600 transition-all"
+                    onClick={() => onSequenceClick(s)}
+                    aria-label={`Open details for sequence ${s.accession}`}
+                    className="font-mono text-blue-600 font-semibold text-[0.95rem] bg-transparent border-none cursor-pointer p-0 underline decoration-transparent hover:decoration-blue-600 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
                   >
                     {s.accession}
                   </button>

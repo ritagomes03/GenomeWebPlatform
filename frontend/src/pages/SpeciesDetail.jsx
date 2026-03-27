@@ -6,9 +6,10 @@ import GraphButtons from '../components/species/GraphButtons'
 import GraphPreviewCard from '../components/species/GraphPreviewCard'
 import SequencesTable from '../components/sequences/SequencesTable'
 import Pagination from '../components/ui/Pagination'
-import Spinner from '../components/ui/Spinner'
 import SequenceModal from '../components/sequences/SequenceModal'
-import { ThemeToggle } from '../components/ui/ThemeToggle'
+import PageLayout from '../components/layout/PageLayout'
+import Skeleton from '../components/ui/Skeleton'
+import EmptyState from '../components/ui/EmptyState'
 
 
 function range(min, max, decimals = 0) {
@@ -40,17 +41,26 @@ export default function SpeciesDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen dark:bg-[#0b1326] bg-slate-50 flex items-center justify-center dark:text-slate-100 text-slate-900">
-        <Spinner />
-      </div>
+      <PageLayout>
+        <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-5">
+          <Skeleton className="h-14 w-2/3" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-[420px] w-full" />
+        </section>
+      </PageLayout>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen dark:bg-[#0b1326] bg-slate-50 flex items-center justify-center text-red-400">
-        Species not found.
-      </div>
+      <PageLayout>
+        <section className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <EmptyState
+            title="Species not found"
+            description="The selected species could not be loaded."
+          />
+        </section>
+      </PageLayout>
     )
   }
 
@@ -59,49 +69,15 @@ export default function SpeciesDetail() {
   const sequences = seqData?.sequences ?? detail?.sequences ?? []
 
   return (
-    <div className="min-h-screen dark:bg-[#0b1326] bg-slate-50 dark:text-slate-100 text-slate-900 font-[Manrope,system-ui,sans-serif] selection:bg-cyan-400/30 selection:text-cyan-300">
-
-      {/* NAVBAR */}
-      <nav className="dark:bg-[#0b1326]/80 bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b dark:border-slate-700/20 border-slate-200/50 shadow-[0_0_40px_rgba(0,0,0,0.2)]">
-        <div className="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
-          <div
-            onClick={() => navigate('/')}
-            className="text-2xl font-bold tracking-tight dark:text-slate-100 text-slate-900 font-[Space_Grotesk,system-ui,sans-serif] cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            ViromeGenomics
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <button onClick={() => navigate('/')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
-              Home
-            </button>
-            <button onClick={() => navigate('/species')} className="text-cyan-400 border-b-2 border-cyan-400 pb-1">
-              Database
-            </button>
-            <button onClick={() => navigate('/analysis')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
-              Analysis
-            </button>
-            <button onClick={() => navigate('/documentation')} className="dark:text-slate-400 text-slate-500 dark:hover:text-slate-100 hover:text-slate-900 transition-colors">
-              Documentation
-            </button>
-          </div>
-
-          {/* TOGGLE */}
-          <div className="w-24 flex justify-end">
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
-
-      <main className="relative overflow-hidden">
+    <PageLayout>
 
         {/* HERO */}
-        <section className="relative px-8 pt-16 pb-12 overflow-hidden">
+        <section className="relative px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 pb-10 md:pb-12 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <img
               src="/virus-750.jpg"
               alt="Virus background"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] object-cover rounded-full dark:opacity-10 opacity-5 blur-[2px] scale-110"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(1100px,140vw)] h-[min(1100px,140vw)] object-cover rounded-full dark:opacity-10 opacity-5 blur-[2px] scale-110"
             />
             <div className="absolute inset-0 dark:bg-[#0b1326]/80 bg-slate-50/80" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,220,229,0.05)_0%,rgba(11,19,38,1)_85%)] dark:block hidden" />
@@ -111,7 +87,7 @@ export default function SpeciesDetail() {
             <div className="mb-6">
               <button
                 onClick={() => navigate('/species')}
-                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 ← Back to Species List
               </button>
@@ -129,7 +105,7 @@ export default function SpeciesDetail() {
           </div>
         </section>
 
-        <section className="max-w-screen-2xl mx-auto px-8 pb-20 relative z-10">
+        <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
 
           {/* STATS CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5 mb-12">
@@ -223,7 +199,8 @@ export default function SpeciesDetail() {
 
               <button
                 onClick={() => genomesApi.downloadZip(id)}
-                className="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-900 px-6 py-3 rounded-xl text-sm font-bold transition-transform hover:-translate-y-0.5 shadow-lg"
+                aria-label="Download species sequences ZIP"
+                className="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-900 px-6 min-h-11 py-3 rounded-xl text-sm font-bold transition-transform hover:-translate-y-0.5 shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <DownloadIcon /> Download Sequences (ZIP)
               </button>
@@ -273,7 +250,7 @@ export default function SpeciesDetail() {
             </div>
           </section>
         </section>
-      </main>
+      
 
       {selectedSequence && (
         <SequenceModal
@@ -281,7 +258,7 @@ export default function SpeciesDetail() {
           onClose={() => setSelectedSequence(null)}
         />
       )}
-    </div>
+    </PageLayout>
   )
 }
 

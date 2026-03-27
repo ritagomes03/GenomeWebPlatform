@@ -4,23 +4,32 @@ const MAX_FILE_BYTES    = 50 * 1024 * 1024
 const MAX_FILE_SIZE_STR = '50MB'
 const ALLOWED_EXTENSIONS = new Set(['.fasta', '.fa', '.fna', '.ffn', '.faa', '.frn'])
 
-const get = (url) =>
-  fetch(url).then(r => {
-    if (!r.ok) throw new Error(r.statusText)
-    return r.json()
-  })
+const parseError = async (response) => {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (contentType.includes('application/json')) {
+    const payload = await response.json().catch(() => ({}))
+    return payload.error || payload.detail || payload.message || response.statusText || 'Request failed'
+  }
+
+  const text = await response.text().catch(() => '')
+  return text.trim() || response.statusText || 'Request failed'
+}
+
+const get = async (url) => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(await parseError(response))
+  return response.json()
+}
 
 const download = (url) => {
   window.location.href = url
 }
 
 const post = async (url, formData) => {
-  const r = await fetch(url, { method: 'POST', body: formData })
-  if (!r.ok) {
-    const err = await r.json().catch(() => ({}))
-    throw new Error(err.error || r.statusText)
-  }
-  return r.json()
+  const response = await fetch(url, { method: 'POST', body: formData })
+  if (!response.ok) throw new Error(await parseError(response))
+  return response.json()
 }
 
 const validateFile = (file) => {
