@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { genomesApi } from '../api/genomes'
+import { useAnalysisFields } from '../hooks/useGenomes'
 import Spinner from '../components/ui/Spinner'
 import PageLayout from '../components/layout/PageLayout'
 import EmptyState from '../components/ui/EmptyState'
@@ -36,18 +37,14 @@ export default function SequenceAnalysis() {
   const [loading, setLoading]           = useState(false)
   const [error, setError]               = useState(null)
 
-  const [availableFields, setAvailableFields] = useState([])
   const [selectedFields, setSelectedFields]   = useState([])
 
-  useEffect(() => {
-    genomesApi.analysisFields()
-      .then(data => setAvailableFields(data.fields))
-      .catch(() => {})
-  }, [])
+  const { data: analysisFields } = useAnalysisFields()
+  const availableFields = analysisFields?.fields ?? []
 
-  // other_1, other_2 → envia "other" ao backend
+  // other_1, other_2 -> envia "other" ao backend
   const metaOrder = selectedFields
-  .map(f => f.startsWith('other_') ? '' : f)
+  .map(f => f.startsWith('other_') ? 'other' : f)
   .join(',')
 
   const addField = (field) => {
@@ -143,7 +140,7 @@ export default function SequenceAnalysis() {
           <div className="mb-6">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <BackIcon /> Back to Home
             </button>
@@ -193,7 +190,7 @@ export default function SequenceAnalysis() {
                       key={field}
                       onClick={() => addField(field)}
                       aria-label={`Add ${FIELD_LABELS[field] ?? field}`}
-                      className="px-3 min-h-11 py-1.5 rounded-lg text-xs font-semibold dark:bg-slate-700/60 bg-slate-200 dark:text-slate-300 text-slate-600 border dark:border-slate-600/40 border-slate-300 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400/30 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                      className="px-3 min-h-11 py-1.5 rounded-lg text-xs font-semibold dark:bg-slate-700/60 bg-slate-200 dark:text-slate-300 text-slate-600 border dark:border-slate-600/40 border-slate-300 hover:bg-cyan-400/10 hover:text-cyan-400 hover:border-cyan-400/30 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
                     >
                       + {FIELD_LABELS[field] ?? field}
                     </button>
@@ -203,7 +200,7 @@ export default function SequenceAnalysis() {
                   <button
                     onClick={addOther}
                     aria-label="Add Other field"
-                    className="px-3 min-h-11 py-1.5 rounded-lg text-xs font-semibold dark:bg-slate-700/60 bg-slate-200 dark:text-slate-300 text-slate-600 border dark:border-slate-600/40 border-slate-300 hover:bg-amber-400/10 hover:text-amber-400 hover:border-amber-400/30 transition-all focus-visible:ring-2 focus-visible:ring-amber-400"
+                    className="px-3 min-h-11 py-1.5 rounded-lg text-xs font-semibold dark:bg-slate-700/60 bg-slate-200 dark:text-slate-300 text-slate-600 border dark:border-slate-600/40 border-slate-300 hover:bg-amber-400/10 hover:text-amber-400 hover:border-amber-400/30 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400"
                   >
                     + Other
                   </button>
@@ -241,20 +238,20 @@ export default function SequenceAnalysis() {
                             onClick={() => moveField(i, -1)}
                             disabled={i === 0}
                             aria-label={`Move ${getLabel(field)} up`}
-                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
                             title="Move up"
                           >▲</button>
                           <button
                             onClick={() => moveField(i, 1)}
                             disabled={i === selectedFields.length - 1}
                             aria-label={`Move ${getLabel(field)} down`}
-                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 dark:hover:text-slate-200 hover:text-slate-700 cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
                             title="Move down"
                           >▼</button>
                           <button
                             onClick={() => removeField(field)}
                             aria-label={`Remove ${getLabel(field)}`}
-                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 hover:text-red-400 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="min-h-11 min-w-11 p-2 rounded dark:text-slate-500 text-slate-400 hover:text-red-400 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
                             title="Remove"
                           >✕</button>
                         </div>
@@ -305,7 +302,7 @@ export default function SequenceAnalysis() {
               onClick={handleSubmit}
               disabled={loading || !file}
               aria-label="Run sequence analysis"
-              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+              className={`px-6 py-3 rounded-xl font-semibold transition-all cursor-pointer ${
                 loading || !file
                   ? 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
                   : 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-slate-950 hover:brightness-110 shadow-lg'
@@ -345,14 +342,14 @@ export default function SequenceAnalysis() {
                 {cleanedFasta && (
                   <button
                     onClick={downloadFasta}
-                    className="px-5 py-3 rounded-xl font-semibold bg-purple-400/10 text-purple-400 border border-purple-400/30 hover:bg-purple-400/20 transition-colors"
+                    className="px-5 py-3 rounded-xl font-semibold bg-purple-400/10 text-purple-400 border border-purple-400/30 hover:bg-purple-400/20 transition-colors cursor-pointer"
                   >
                     Download Cleaned FASTA
                   </button>
                 )}
                 <button
                   onClick={downloadCSV}
-                  className="px-5 py-3 rounded-xl font-semibold bg-cyan-400/10 text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400/20 transition-colors"
+                  className="px-5 py-3 rounded-xl font-semibold bg-cyan-400/10 text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400/20 transition-colors cursor-pointer"
                 >
                   Download CSV
                 </button>

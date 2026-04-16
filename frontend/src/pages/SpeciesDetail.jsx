@@ -26,8 +26,7 @@ export default function SpeciesDetail() {
   const [seqPage, setSeqPage] = useState(1)
   const [previews, setPreviews] = useState([])
 
-  const { data: detail, isLoading, error } = useTaxonomyDetail(id)
-  const { data: seqData, isLoading: seqLoading } = useTaxonomyDetail(id, { page: seqPage })
+  const { data: detail, isLoading, error, isFetching: seqLoading } = useTaxonomyDetail(id, { page: seqPage })
 
   function togglePreview(key, label) {
     setPreviews((prev) =>
@@ -69,7 +68,7 @@ export default function SpeciesDetail() {
 
   const tax = detail?.taxonomy ?? detail
   const hasGraphs = detail?.graphs_exist && Object.values(detail.graphs_exist).some(Boolean)
-  const sequences = seqData?.sequences ?? detail?.sequences ?? []
+  const sequences = detail?.sequences ?? []
 
   return (
     <PageLayout>
@@ -89,7 +88,7 @@ export default function SpeciesDetail() {
           <div className="mb-6">
             <button
               onClick={() => navigate('/species')}
-              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               ← Back to Species List
             </button>
@@ -202,7 +201,7 @@ export default function SpeciesDetail() {
             <button
               onClick={() => genomesApi.downloadZip(id)}
               aria-label="Download species sequences ZIP"
-              className="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-900 px-6 min-h-11 py-3 rounded-xl text-sm font-bold transition-transform hover:-translate-y-0.5 shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="inline-flex items-center gap-2 bg-cyan-400 hover:bg-cyan-300 text-slate-900 px-6 min-h-11 py-3 rounded-xl text-sm font-bold transition-transform hover:-translate-y-0.5 shadow-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <DownloadIcon /> Download Sequences (ZIP)
             </button>
@@ -221,8 +220,8 @@ export default function SpeciesDetail() {
 
           <div className="mt-8 flex justify-center items-center">
             <Pagination
-              page={seqData?.page ?? 1}
-              numPages={seqData?.num_pages ?? 1}
+              page={detail?.page ?? 1}
+              numPages={detail?.num_pages ?? 1}
               onPageChange={setSeqPage}
             />
           </div>

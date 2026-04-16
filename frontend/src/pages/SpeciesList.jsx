@@ -38,7 +38,7 @@ export default function SpeciesList() {
         setPage(1)
       }}
       aria-pressed={sort === value}
-      className={`px-4 min-h-11 py-2 rounded-xl text-sm transition-all border focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+      className={`px-4 min-h-11 py-2 rounded-xl text-sm transition-all border cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400 ${
         sort === value
           ? 'font-semibold text-cyan-900 bg-cyan-400 border-cyan-400 shadow-sm'
           : 'dark:text-slate-100 text-slate-600 dark:border-slate-500 border-slate-300 dark:hover:bg-slate-500 hover:bg-slate-200 dark:hover:text-white hover:text-slate-900'
@@ -92,7 +92,7 @@ export default function SpeciesList() {
             <div className="mb-6">
               <button
                 onClick={() => navigate('/')}
-                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <BackIcon /> Back to Home
               </button>
@@ -129,26 +129,26 @@ export default function SpeciesList() {
               <button
                 onClick={genomesApi.downloadMetadata}
                 aria-label="Download metadata CSV"
-                className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-xl text-sm font-semibold border border-cyan-400/50 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 rounded-xl text-sm font-semibold border border-cyan-400/50 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <DownloadIcon /> CSV
               </button>
               <button
                 onClick={genomesApi.downloadAllFasta}
                 aria-label="Download all FASTA sequences"
-                className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-400 rounded-xl text-sm font-semibold border border-emerald-400/50 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-400 rounded-xl text-sm font-semibold border border-emerald-400/50 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <DownloadIcon /> FASTA
               </button>
 
-              <div className="flex flex-wrap md:flex-nowrap items-stretch">
-                <div className="[&>div]:!dark:bg-slate-600/80 [&>div]:!bg-slate-100 [&_input]:!bg-transparent [&_input]:!dark:text-white [&_input]:!text-slate-900 [&_input]:!dark:placeholder:text-slate-300 [&_input]:!placeholder:text-slate-400 [&_input]:!dark:border-slate-500 [&_input]:!border-slate-300 [&_*]:!dark:border-slate-500 [&_*]:!border-slate-300">
+              <div className="species-search flex flex-wrap md:flex-nowrap items-stretch rounded-xl overflow-hidden">
+                <div className="[&>div]:!dark:bg-slate-600/80 [&>div]:!bg-slate-100 [&>div]:!rounded-l-xl [&>div]:!rounded-r-none [&>div]:!overflow-hidden [&_input]:!rounded-l-xl [&_input]:!rounded-r-none [&_input]:!bg-transparent [&_input]:!dark:text-white [&_input]:!text-slate-900 [&_input]:!dark:placeholder:text-slate-300 [&_input]:!placeholder:text-slate-400 [&_input]:!dark:border-slate-500 [&_input]:!border-slate-300 [&_*]:!dark:border-slate-500 [&_*]:!border-slate-300">
                   <Autocomplete value={search} onChange={setSearch} onSelect={handleSearch} />
                 </div>
                 <button
                   onClick={() => handleSearch(search)}
                   aria-label="Search species"
-                  className="px-6 min-h-11 py-3 bg-cyan-400 hover:bg-cyan-300 text-slate-900 rounded-r-xl text-sm font-bold transition-all border-none cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  className="px-6 min-h-11 py-3 bg-cyan-400 hover:bg-cyan-300 text-slate-900 rounded-r-xl text-sm font-bold transition-all border-none cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                 >
                   Search
                 </button>

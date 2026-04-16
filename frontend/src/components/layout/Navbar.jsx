@@ -59,7 +59,7 @@ export default function Navbar() {
             aria-label="Go to home page"
             className="text-2xl font-bold tracking-tight dark:text-slate-100 text-slate-900 font-[Space_Grotesk,system-ui,sans-serif] bg-transparent border-none cursor-pointer hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-md"
           >
-            ViromeGenomics
+            HVGD
           </button>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -72,8 +72,8 @@ export default function Navbar() {
                   onClick={() => goTo(to)}
                   aria-current={active ? 'page' : undefined}
                   className={active
-                    ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 focus-visible:ring-2 focus-visible:ring-cyan-400'
-                    : 'dark:text-slate-300 text-slate-600 dark:hover:text-slate-100 hover:text-slate-900 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400'}
+                    ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400'
+                    : 'dark:text-slate-300 text-slate-600 dark:hover:text-slate-100 hover:text-slate-900 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400'}
                 >
                   {label}
                 </button>
@@ -90,7 +90,7 @@ export default function Navbar() {
               aria-expanded={open}
               aria-controls="mobile-main-menu"
               aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-              className="md:hidden relative inline-flex items-center justify-center min-h-11 min-w-11 rounded-xl border dark:border-slate-600/70 border-slate-300 bg-white/70 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-colors hover:border-cyan-400/60"
+              className="md:hidden relative inline-flex items-center justify-center min-h-11 min-w-11 rounded-xl border dark:border-slate-600/70 border-slate-300 bg-white/70 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400 transition-colors hover:border-cyan-400/60"
             >
               <span className="sr-only">Toggle navigation menu</span>
               <span className={`absolute h-0.5 w-5 bg-current transition-all duration-300 ${open ? 'rotate-45' : '-translate-y-1.5'}`} />
@@ -113,7 +113,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => goTo(to)}
                   aria-current={active ? 'page' : undefined}
-                  className={`w-full text-left min-h-11 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  className={`w-full text-left min-h-11 px-4 py-3 rounded-xl font-medium transition-colors cursor-pointer ${
                     active
                       ? 'bg-cyan-400/15 text-cyan-400'
                       : 'dark:text-slate-200 text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800/80'

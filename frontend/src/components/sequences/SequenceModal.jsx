@@ -55,7 +55,7 @@ export default function SequenceModal({ sequence, onClose }) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white dark:border-slate-500 dark:bg-slate-700 sticky top-0 z-10">
           <h2
             id={modalTitleId}
-            className="text-2xl font-bold text-slate-900 dark:text-white font-[Space_Grotesk,system-ui,sans-serif]"
+            className="text-2xl font-bold text-slate-900 dark:text-white font-[Space_Grotesk,system-ui,sans-serif] break-all pr-3"
           >
             {sequence?.accession || sequence?.genome_id || 'Sequence Details'}
           </h2>
@@ -64,7 +64,7 @@ export default function SequenceModal({ sequence, onClose }) {
             ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close sequence details"
-            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-600 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-cyan-300"
+            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-600 rounded-full transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-300"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -80,7 +80,7 @@ export default function SequenceModal({ sequence, onClose }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div>
                 <div className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-300 mb-1 font-semibold">Organism Name</div>
-                <div className="text-slate-900 dark:text-white text-[0.95rem]">{sequence?.organism_name ?? '—'}</div>
+                <div className="text-slate-900 dark:text-white text-[0.95rem] break-words">{sequence?.organism_name ?? '—'}</div>
               </div>
               <div>
                 <div className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-300 mb-1 font-semibold">Collection Date</div>

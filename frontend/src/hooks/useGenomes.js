@@ -22,14 +22,8 @@ export const useTaxonomyDetail = (id, params = {}) =>
     placeholderData: keepPreviousData,
   })
 
-
-export const useSequences = (id, params) =>
+export const useAnalysisFields = () =>
   useQuery({
-    queryKey: ['sequences', id, params],
-    queryFn: () => genomesApi.sequences(id, params),
-    enabled: !!id,
-    placeholderData: keepPreviousData,
+    queryKey: ['analysis-fields'],
+    queryFn: genomesApi.analysisFields,
   })
-
-export const useGraphs = (id) =>
-  useQuery({ queryKey: ['graphs', id], queryFn: () => genomesApi.graphs(id), enabled: !!id })

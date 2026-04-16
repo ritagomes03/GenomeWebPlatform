@@ -3,9 +3,6 @@ import io
 import zipfile
 from pathlib import Path
 
-from Bio.Seq import Seq
-from Bio.SeqUtils import MeltingTemp as mt
-
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Sum
@@ -19,110 +16,11 @@ from .utils.uniformizer import STANDARD_HEADER_FIELDS, FIELD_ALIASES
 
 from .models import Sequence, Taxonomy
 from .serializers import SequenceSerializer, TaxonomyDetailSerializer, TaxonomyListSerializer
-from .utils.uniformizer import (
-    uniformize_sequence_data,
-    _count_original_sequences,
-)
+from .services.analysis import build_cleaned_fasta, clean_sequence_id, process_sequence, read_upload
+from .services.graph import build_graph_files, get_graph_base_dirs, species_folder_name
+from .utils.uniformizer import uniformize_sequence_data, _count_original_sequences
 
-MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 MAX_SEQUENCES    = 5_000
-ALLOWED_EXTENSIONS = {'.fasta', '.fa', '.fna', '.ffn', '.faa', '.frn'}
-
-
-# ─── Helpers ──────────────────────────────────────────────────────────────────
-
-def _get_graph_base_dirs(species_name):
-    folder_name = species_name.strip().replace(' ', '_').replace('-', '_').replace('.', '_')
-    candidates = [
-        Path(settings.BASE_DIR) / 'static',
-        Path(settings.BASE_DIR),
-        Path(settings.BASE_DIR).parent,
-    ]
-    for root in candidates:
-        if (root / 'graphs' / folder_name).exists() or (root / 'graphs_semout' / folder_name).exists():
-            return root, folder_name
-    return None, folder_name
-
-
-def _build_graph_files(root_path, folder_name):
-    if not root_path:
-        return {}
-    
-    path_graphs = root_path / 'graphs' / folder_name
-    path_semout = root_path / 'graphs_semout' / folder_name
-
-    return {
-        'length':       path_semout / 'lengthgraph' / 'sem_tendencia' / folder_name / 'length_histograms' / f'{folder_name}_length_histogram.pdf',
-        'gc':           path_semout / 'gcContentGraphs' / 'sem_tendencia' / f'{folder_name}_gc_histogram.pdf',
-        'entropy':      path_graphs / 'entropyGraphs'     / f'{folder_name}_entropy.pdf',
-        'melting_temp': path_graphs / 'meltingTempGraphs' / f'{folder_name}_melting_temp.pdf',
-        'bases_tempo':  path_graphs / 'basesTempoGraphs'  / f'{folder_name}_bases_tempo.pdf',
-    }
-
-
-def _clean_sequence_id(header: str, max_length: int = 25) -> str:
-    if not header:
-        return ""
-    clean_id = next((p for p in header.split('|') if p.strip()), "")
-    if not clean_id:
-        return ""
-    return clean_id[:max_length] + '...' if len(clean_id) > max_length else clean_id
-
-
-def _process_sequence(seq_id, seq_str):
-    seq_str = seq_str.upper()
-    length  = len(seq_str)
-
-    if length == 0:
-        return {'id': seq_id, 'length': 0, 'gc_content': 0,
-                'a_perc': 0, 't_perc': 0, 'c_perc': 0, 'g_perc': 0, 'melting_temp': 0}
-
-    count_a, count_t = seq_str.count('A'), seq_str.count('T')
-    count_c, count_g = seq_str.count('C'), seq_str.count('G')
-
-    try:
-        tm_val = round(float(mt.Tm_NN(Seq(seq_str), nn_table=mt.DNA_NN3)), 2)
-    except Exception:
-        tm_val = 0
-
-    return {
-        'id':           seq_id,
-        'length':       length,
-        'gc_content':   round(((count_g + count_c) / length) * 100, 2),
-        'a_perc':       round((count_a / length) * 100, 2),
-        't_perc':       round((count_t / length) * 100, 2),
-        'c_perc':       round((count_c / length) * 100, 2),
-        'g_perc':       round((count_g / length) * 100, 2),
-        'melting_temp': tm_val,
-    }
-
-
-def _build_cleaned_fasta(cleaned_sequences: list[tuple[str, str]]) -> str:
-    lines = []
-    for header, seq_str in cleaned_sequences:
-        wrapped = '\n'.join(seq_str[i:i+80] for i in range(0, len(seq_str), 80))
-        lines.append(f'>{header}\n{wrapped}')
-    return '\n'.join(lines)
-
-
-def _read_upload(request) -> tuple[str, str] | Response:
-    if 'fasta_file' not in request.FILES:
-        return Response({'error': 'O ficheiro fasta_file é obrigatório.'}, status=400)
-
-    file = request.FILES['fasta_file']
-    ext  = Path(file.name).suffix.lower()
-
-    if ext not in ALLOWED_EXTENSIONS:
-        return Response({'error': f'Tipo de ficheiro inválido: {ext}'}, status=400)
-
-    raw = file.read(MAX_UPLOAD_BYTES + 1)
-    if len(raw) > MAX_UPLOAD_BYTES:
-        return Response({'error': 'Ficheiro demasiado grande. Limite: 50MB.'}, status=413)
-
-    content    = raw.decode('utf-8-sig').strip().replace('\x00', '')
-    meta_order = request.data.get('meta_order', '').strip()
-    return content, meta_order
-
 
 # ─── ViewSets ─────────────────────────────────────────────────────────────────
 
@@ -161,9 +59,9 @@ class TaxonomyViewSet(viewsets.ReadOnlyModelViewSet):
 
     def retrieve(self, request, pk=None):
         tax = self.get_object()
-        root_path, folder_name = _get_graph_base_dirs(tax.species)
+        root_path, folder_name = get_graph_base_dirs(tax.species)
 
-        graph_files  = _build_graph_files(root_path, folder_name)
+        graph_files  = build_graph_files(root_path, folder_name)
         graphs_exist = {k: v.exists() for k, v in graph_files.items()}
 
         sequences_qs = Sequence.objects.filter(taxonomy=tax).select_related('metrics')
@@ -209,12 +107,12 @@ class TaxonomyViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'], url_path='graph')
     def download_graph(self, request, pk=None):
         tax = self.get_object()
-        root_path, folder_name = _get_graph_base_dirs(tax.species)
+        root_path, folder_name = get_graph_base_dirs(tax.species)
 
         if not root_path:
             raise Http404('Graph folders not found.')
 
-        file_path = _build_graph_files(root_path, folder_name).get(request.GET.get('type'))
+        file_path = build_graph_files(root_path, folder_name).get(request.GET.get('type'))
         if not file_path or not file_path.exists():
             raise Http404('Requested graph not found.')
 
@@ -226,7 +124,7 @@ class TaxonomyViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'], url_path='download')
     def download_zip(self, request, pk=None):
         tax         = self.get_object()
-        folder_name = tax.species.strip().replace(' ', '_').replace('-', '_').replace('.', '_')
+        folder_name = species_folder_name(tax.species)
         zip_path    = Path(settings.BASE_DIR) / 'data' / 'species_compressed' / f'{folder_name}.zip'
 
         if not zip_path.exists():
@@ -317,7 +215,7 @@ class AnalysisViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='fasta', parser_classes=[MultiPartParser])
     def analyze_fasta(self, request):
-        upload = _read_upload(request)
+        upload = read_upload(request)
         if isinstance(upload, Response):
             return upload
         content, meta_order = upload
@@ -325,12 +223,12 @@ class AnalysisViewSet(viewsets.ViewSet):
             cleaned = uniformize_sequence_data(content, meta_order)
             if len(cleaned) > MAX_SEQUENCES:
                 return Response({'error': f'Demasiadas sequências. Limite: {MAX_SEQUENCES}.'}, status=400)
-            results = [_process_sequence(_clean_sequence_id(h), s) for h, s in cleaned]
+            results = [process_sequence(clean_sequence_id(h), s) for h, s in cleaned]
             return Response({
                 'results':       results,
                 'meta':          {'original_count': _count_original_sequences(content),
                                   'cleaned_count':  len(results)},
-                'cleaned_fasta': _build_cleaned_fasta(cleaned),
+                'cleaned_fasta': build_cleaned_fasta(cleaned),
             })
         except ValueError as e:
             return Response({'error': str(e)}, status=400)
@@ -339,7 +237,7 @@ class AnalysisViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='uniformize', parser_classes=[MultiPartParser])
     def uniformize(self, request):
-        upload = _read_upload(request)
+        upload = read_upload(request)
         if isinstance(upload, Response):
             return upload
         content, meta_order = upload
@@ -351,7 +249,7 @@ class AnalysisViewSet(viewsets.ViewSet):
                 'message':       'Uniformização concluída com sucesso.',
                 'meta':          {'original_count': _count_original_sequences(content),
                                   'cleaned_count':  len(cleaned)},
-                'cleaned_fasta': _build_cleaned_fasta(cleaned),
+                'cleaned_fasta': build_cleaned_fasta(cleaned),
             })
         except ValueError as e:
             return Response({'error': str(e)}, status=400)

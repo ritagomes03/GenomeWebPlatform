@@ -13,6 +13,26 @@ body {
   outline-offset: 2px;
 }
 
+/* Disable rectangular focus frame only for the home hero search bar. */
+.home-search .home-search-input:focus,
+.home-search .home-search-input:focus-visible,
+.home-search .home-search-shell:focus,
+.home-search .home-search-shell:focus-visible,
+.home-search .home-search-shell:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Disable rectangular focus frame for Species page search controls. */
+.species-search input:focus,
+.species-search input:focus-visible,
+.species-search button:focus,
+.species-search button:focus-visible,
+.species-search div:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

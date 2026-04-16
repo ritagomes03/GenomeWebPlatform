@@ -48,11 +48,11 @@ export function SearchBar() {
   }
 
   return (
-    <div className="relative max-w-4xl mx-auto w-full" ref={containerRef}>
+    <div className="home-search relative max-w-4xl mx-auto w-full" ref={containerRef}>
       <div
-        className={`dark:bg-slate-800/90 bg-white/90 backdrop-blur-xl p-2 rounded-xl border flex items-center transition-all duration-300 ${
+        className={`home-search-shell dark:bg-slate-800/90 bg-white/90 backdrop-blur-xl p-2 rounded-xl border flex items-center transition-all duration-300 ${
           open
-            ? 'border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.1)]'
+            ? 'dark:border-slate-500 border-slate-400 shadow-lg'
             : 'dark:border-slate-700/50 border-slate-300/50 shadow-lg dark:hover:border-slate-500 hover:border-slate-400'
         }`}
       >
@@ -79,13 +79,13 @@ export function SearchBar() {
           placeholder="Enter viral name, specie, or family..."
           autoComplete="off"
           aria-label="Search species by viral name, species, or family"
-          className="bg-transparent border-none outline-none flex-1 dark:text-slate-100 text-slate-900 dark:placeholder:text-slate-500 placeholder:text-slate-400 py-3 text-base w-full pr-4"
+          className="home-search-input bg-transparent border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 flex-1 dark:text-slate-100 text-slate-900 dark:placeholder:text-slate-500 placeholder:text-slate-400 py-3 text-base w-full pr-4"
         />
       </div>
 
       {open && (
         <div
-          className="absolute top-[calc(100%+10px)] left-0 right-0 dark:bg-slate-800/95 bg-white/95 backdrop-blur-xl rounded-xl border border-cyan-400/50 shadow-[0_20px_40px_rgba(0,0,0,0.6)] z-50 max-h-[70vh] overflow-y-auto py-2 text-left"
+          className="absolute top-[calc(100%+10px)] left-0 right-0 dark:bg-slate-800/95 bg-white/95 backdrop-blur-xl rounded-xl border dark:border-slate-600 border-slate-300 shadow-[0_20px_40px_rgba(0,0,0,0.6)] z-50 max-h-[70vh] overflow-y-auto py-2 text-left"
           role="listbox"
           aria-label="Search suggestions"
         >
@@ -97,7 +97,7 @@ export function SearchBar() {
                 submit(s)
               }}
               role="option"
-              className="w-full text-left px-6 py-3.5 dark:text-slate-300 text-slate-700 transition-colors dark:hover:bg-slate-700/60 hover:bg-slate-100 hover:text-cyan-400 flex items-center gap-3 dark:border-b dark:border-slate-700/30 border-b border-slate-200/50 last:border-0 focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="w-full text-left px-6 py-3.5 dark:text-slate-300 text-slate-700 transition-colors dark:hover:bg-slate-700/60 hover:bg-slate-100 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-3 cursor-pointer dark:border-b dark:border-slate-700/30 border-b border-slate-200/50 last:border-0 focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               <span className="dark:text-slate-500 text-slate-400 text-sm">🔍</span>
               {s}
@@ -145,9 +145,7 @@ function SpeciesCard({ species, onClick }) {
           </span>
         </div>
 
-        <div className="mt-4 h-1 dark:bg-slate-700/70 bg-slate-700/50 rounded-full overflow-hidden">
-          <div className="h-full bg-cyan-400 w-[70%]" />
-        </div>
+
       </div>
     </button>
   )
@@ -330,7 +328,7 @@ export default function Home() {
               </div>
               <button
                 onClick={() => navigate('/species')}
-                className="text-cyan-400 text-sm uppercase tracking-widest border-b border-cyan-400 pb-1 hover:text-cyan-300 hover:border-cyan-300 transition-all"
+                className="text-cyan-400 text-sm uppercase tracking-widest border-b border-cyan-400 pb-1 hover:text-cyan-300 hover:border-cyan-300 transition-all cursor-pointer"
               >
                 View all database
               </button>
@@ -387,20 +385,28 @@ export default function Home() {
 
       </div> {/* FECHO DO CONTENTOR GLOBAL */}
 
-      {/* FOOTER - Mantido com a sua cor original e fora do contentor */}
       <footer className="dark:bg-slate-700/90 bg-slate-200/90 w-full border-t dark:border-slate-600 border-slate-300">
         <div className="max-w-screen-2xl mx-auto px-12">
           <div className="py-8 flex flex-wrap items-center justify-center gap-16 md:gap-24">
             <img
-              src="/uh.png"
-              alt="University of Helsinki"
-              className="object-contain h-32 opacity-100 transition-all hover:scale-105"
-            />
-            <img
               src="/ua.png"
               alt="University of Aveiro"
-              className="object-contain h-32 opacity-100 transition-all hover:scale-105"
+              className="object-contain h-32 opacity-100"
             />
+            <img
+              src="/uh.png"
+              alt="University of Helsinki"
+              className="object-contain h-32 opacity-100"
+            />
+          </div>
+          <div className="pt-2 pb-10 text-center">
+            <p className="font-[Space_Grotesk,system-ui,sans-serif] text-[0.72rem] md:text-xs font-bold uppercase tracking-[0.28em] text-cyan-500">
+              HVGD
+            </p>
+            <p className="mt-2 font-[Manrope,system-ui,sans-serif] text-base md:text-lg font-medium tracking-[0.02em] dark:text-slate-100 text-slate-800">
+              Human Viral Genome Database
+            </p>
+            <div className="mx-auto mt-4 h-px w-24 dark:bg-slate-500/70 bg-slate-400/70" />
           </div>
         </div>
       </footer>
