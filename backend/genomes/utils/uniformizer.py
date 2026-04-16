@@ -49,11 +49,20 @@ def _normalize_field(raw: str) -> str:
     return FIELD_ALIASES.get(key, key.replace(" ", "_"))
 
 
-def _parse_meta_order(meta_order_str: str) -> list[str]:
-    fields = [_normalize_field(f) for f in meta_order_str.split(",") if f.strip()]
-    if not fields:
+def _parse_meta_order(meta_order_str: str) -> list[str | None]:
+    raw_fields = meta_order_str.split(",")
+    fields = []
+    for f in raw_fields:
+        if not f.strip():
+            fields.append(None)          # posição "other" — ignorar
+        else:
+            fields.append(_normalize_field(f))
+
+    non_empty = [f for f in fields if f is not None]
+    if not non_empty:
         raise ValueError("Header order string is empty or invalid.")
-    unknown = [f for f in fields if f not in STANDARD_HEADER_FIELDS]
+
+    unknown = [f for f in non_empty if f not in STANDARD_HEADER_FIELDS]
     if unknown:
         raise ValueError(
             f"Invalid fields in header order: {', '.join(unknown)}. "
@@ -62,9 +71,9 @@ def _parse_meta_order(meta_order_str: str) -> list[str]:
     return fields
 
 
-def _parse_header(raw_header: str, order_fields: list[str]) -> str:
+def _parse_header(raw_header: str, order_fields: list[str | None]) -> str:
     data = {k: "" for k in STANDARD_HEADER_FIELDS}
-    raw_header = raw_header.strip()[:500]  # cap before regex work
+    raw_header = raw_header.strip()[:500]
 
     if "=" in raw_header:
         for part in re.split(r"[|;]", raw_header):
@@ -76,16 +85,18 @@ def _parse_header(raw_header: str, order_fields: list[str]) -> str:
             if k in data:
                 data[k] = v.strip().strip('"')
     else:
-        tokens = [t.strip() for t in raw_header.split("|")]
-        if len(tokens) == 1:
+        all_tokens = [t.strip() for t in raw_header.split("|")]
+        if len(all_tokens) == 1:
             parts = raw_header.split(maxsplit=1)
-            data["accession"]    = parts[0] if parts else ""
+            data["accession"]     = parts[0] if parts else ""
             data["organism_name"] = parts[1] if len(parts) > 1 else ""
         else:
-            for i, token in enumerate(tokens):
-                if i >= len(order_fields):
-                    break
-                field = _normalize_field(order_fields[i])
+            valid_pairs = [
+                (field, token)
+                for field, token in zip(order_fields, all_tokens)
+                if field is not None          # None = other, ignorar
+            ]
+            for field, token in valid_pairs:
                 if field in data and token:
                     data[field] = token
 

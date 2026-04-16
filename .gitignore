@@ -35,3 +35,4 @@ Thumbs.db
 *.swo
 
 docker-compose.override.yml
+graphs_semout

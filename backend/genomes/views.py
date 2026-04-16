@@ -24,34 +24,39 @@ from .utils.uniformizer import (
     _count_original_sequences,
 )
 
-# nginx allows 100MB — stay just under at the application layer
-MAX_UPLOAD_BYTES = 50 * 1024 * 1024   # 50 MB
+MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 MAX_SEQUENCES    = 5_000
 ALLOWED_EXTENSIONS = {'.fasta', '.fa', '.fna', '.ffn', '.faa', '.frn'}
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
-def _get_species_graph_path(species_name):
+def _get_graph_base_dirs(species_name):
     folder_name = species_name.strip().replace(' ', '_').replace('-', '_').replace('.', '_')
     candidates = [
-        Path(settings.BASE_DIR) / 'static' / 'graphs',
-        Path(settings.BASE_DIR) / 'graphs',
-        Path(settings.BASE_DIR).parent / 'graphs',
+        Path(settings.BASE_DIR) / 'static',
+        Path(settings.BASE_DIR),
+        Path(settings.BASE_DIR).parent,
     ]
-    for path in candidates:
-        if (path / folder_name).exists():
-            return path / folder_name, folder_name
+    for root in candidates:
+        if (root / 'graphs' / folder_name).exists() or (root / 'graphs_semout' / folder_name).exists():
+            return root, folder_name
     return None, folder_name
 
 
-def _build_graph_files(base_path, folder_name):
+def _build_graph_files(root_path, folder_name):
+    if not root_path:
+        return {}
+    
+    path_graphs = root_path / 'graphs' / folder_name
+    path_semout = root_path / 'graphs_semout' / folder_name
+
     return {
-        'length':       base_path / 'length_histograms' / f'{folder_name}_length_histogram.pdf',
-        'gc':           base_path / 'gcContentGraphs'   / f'{folder_name}_gc_histogram.pdf',
-        'entropy':      base_path / 'entropyGraphs'     / f'{folder_name}_entropy.pdf',
-        'melting_temp': base_path / 'meltingTempGraphs' / f'{folder_name}_melting_temp.pdf',
-        'bases_tempo':  base_path / 'basesTempoGraphs'  / f'{folder_name}_bases_tempo.pdf',
+        'length':       path_semout / 'lengthgraph' / 'sem_tendencia' / folder_name / 'length_histograms' / f'{folder_name}_length_histogram.pdf',
+        'gc':           path_semout / 'gcContentGraphs' / 'sem_tendencia' / f'{folder_name}_gc_histogram.pdf',
+        'entropy':      path_graphs / 'entropyGraphs'     / f'{folder_name}_entropy.pdf',
+        'melting_temp': path_graphs / 'meltingTempGraphs' / f'{folder_name}_melting_temp.pdf',
+        'bases_tempo':  path_graphs / 'basesTempoGraphs'  / f'{folder_name}_bases_tempo.pdf',
     }
 
 
@@ -156,9 +161,9 @@ class TaxonomyViewSet(viewsets.ReadOnlyModelViewSet):
 
     def retrieve(self, request, pk=None):
         tax = self.get_object()
-        base_path, folder_name = _get_species_graph_path(tax.species)
+        root_path, folder_name = _get_graph_base_dirs(tax.species)
 
-        graph_files  = _build_graph_files(base_path, folder_name) if base_path else {}
+        graph_files  = _build_graph_files(root_path, folder_name)
         graphs_exist = {k: v.exists() for k, v in graph_files.items()}
 
         sequences_qs = Sequence.objects.filter(taxonomy=tax).select_related('metrics')
@@ -204,12 +209,12 @@ class TaxonomyViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'], url_path='graph')
     def download_graph(self, request, pk=None):
         tax = self.get_object()
-        base_path, folder_name = _get_species_graph_path(tax.species)
+        root_path, folder_name = _get_graph_base_dirs(tax.species)
 
-        if not base_path:
-            raise Http404('Graph folder not found.')
+        if not root_path:
+            raise Http404('Graph folders not found.')
 
-        file_path = _build_graph_files(base_path, folder_name).get(request.GET.get('type'))
+        file_path = _build_graph_files(root_path, folder_name).get(request.GET.get('type'))
         if not file_path or not file_path.exists():
             raise Http404('Requested graph not found.')
 
@@ -302,7 +307,6 @@ class GlobalViewSet(viewsets.ViewSet):
 # ─── Analysis ViewSet ─────────────────────────────────────────────────────────
 
 class AnalysisViewSet(viewsets.ViewSet):
-
 
     @action(detail=False, methods=['get'], url_path='fields')
     def fields(self, request):

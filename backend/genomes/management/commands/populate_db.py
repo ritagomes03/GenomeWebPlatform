@@ -1,19 +1,40 @@
 import csv
+import gc
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Min, Max
-from genomes.models import Taxonomy, Sequence, SequenceMetrics
+from django.apps import apps
+from django.db import connection, reset_queries
 
 class Command(BaseCommand):
     help = 'Populate the database with genome data from CSV files'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Clearing database...")
+        Taxonomy = apps.get_model('genomes', 'Taxonomy')
+        Sequence = apps.get_model('genomes', 'Sequence')
+        SequenceMetrics = apps.get_model('genomes', 'SequenceMetrics')
+
+        self.stdout.write("Clearing database (Fast mode)...")
+        # Usar SQL direto (TRUNCATE) contorna o limite de RAM do Python
+        with connection.cursor() as cursor:
+            cursor.execute('TRUNCATE TABLE genomes_sequencemetrics CASCADE;')
+            cursor.execute('TRUNCATE TABLE genomes_sequence CASCADE;')
+            cursor.execute('TRUNCATE TABLE genomes_taxonomy CASCADE;')
+        
+        reset_queries()
+
+        batch_size = 1000
+        created_accessions = set()
+
+        self.stdout.write("Importing metadados.csv...")
+    
         SequenceMetrics.objects.all().delete()
         Sequence.objects.all().delete()
         Taxonomy.objects.all().delete()
 
-        batch_size = 10000
+        batch_size = 5000
+        # Guardamos os IDs criados para validar as métricas depois
+        created_accessions = set()
 
         self.stdout.write("Importing metadados.csv...")
         tax_cache = {}
@@ -23,20 +44,21 @@ class Command(BaseCommand):
             reader = csv.DictReader(f)
             for row in reader:
                 species_val = row.get('species', '').strip()
-                if not species_val:
-                    continue
+                if not species_val: continue
 
                 if species_val not in tax_cache:
                     tax, _ = Taxonomy.objects.get_or_create(
                         species=species_val,
-                        defaults={
-                            'family': row.get('family', '').strip(),
-                            'genus': row.get('genus', '').strip()
-                        }
+                        defaults={'family': row.get('family', '').strip(), 'genus': row.get('genus', '').strip()}
                     )
                     tax_cache[species_val] = tax
                 else:
                     tax = tax_cache[species_val]
+
+                acc_id = row.get('accession_id', '').strip()
+                if not acc_id: continue
+                
+                created_accessions.add(acc_id)
 
                 dt_str = row.get('collection_date')
                 dt_obj = None
@@ -44,13 +66,11 @@ class Command(BaseCommand):
                     try:
                         dt_obj = datetime.strptime(dt_str.strip(), '%Y-%m-%d').date()
                     except ValueError:
-                        try:
-                            dt_obj = datetime.strptime(dt_str.strip()[:4], '%Y').date()
-                        except ValueError:
-                            pass
+                        try: dt_obj = datetime.strptime(dt_str.strip()[:4], '%Y').date()
+                        except ValueError: pass
 
                 sequences_to_create.append(Sequence(
-                    accession=row.get('accession_id', '').strip(),
+                    accession=acc_id,
                     taxonomy=tax,
                     organism_name=row.get('organism_name', '').strip(),
                     country=row.get('country', '').strip(),
@@ -78,12 +98,12 @@ class Command(BaseCommand):
         with open('data/genomes.csv', 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
+                # O seu erro estava aqui: o ID do genomes.csv tem de existir no metadados.csv
                 acc_id = row.get('genome_id', '').strip()
-                if not acc_id:
+                if not acc_id or acc_id not in created_accessions:
                     continue
 
                 length_val = to_f(row.get('length'))
-                
                 metrics_to_create.append(SequenceMetrics(
                     sequence_id=acc_id,
                     length=int(length_val) if length_val else None,
@@ -104,6 +124,7 @@ class Command(BaseCommand):
                 SequenceMetrics.objects.bulk_create(metrics_to_create, ignore_conflicts=True)
 
         self.stdout.write("Calculating Taxonomy statistics...")
+        # (O resto do código de estatísticas que já tinha mantém-se igual)
         taxonomies = Taxonomy.objects.annotate(
             calc_count=Count('sequences'),
             calc_min_len=Min('sequences__metrics__length'),
@@ -134,10 +155,8 @@ class Command(BaseCommand):
             taxs_to_update.append(t)
 
         Taxonomy.objects.bulk_update(taxs_to_update, [
-            'sequence_count', 'min_length', 'max_length', 
-            'min_gc', 'max_gc', 
-            'min_mt', 'max_mt', 'min_ent', 'max_ent', 
-            'first_collection', 'last_collection'
+            'sequence_count', 'min_length', 'max_length', 'min_gc', 'max_gc', 
+            'min_mt', 'max_mt', 'min_ent', 'max_ent', 'first_collection', 'last_collection'
         ])
 
         self.stdout.write(self.style.SUCCESS("Import completed successfully!"))

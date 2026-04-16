@@ -14,10 +14,10 @@ function SourceLink({ sourceDb, genomeId, accession }) {
 }
 
 export default function SequencesTable({ sequences, loading, availableYears, year, onYearChange, onSequenceClick }) {
-  const th = "bg-slate-50 font-semibold text-slate-500 uppercase text-xs tracking-wide px-6 py-4 border-b border-slate-200"
+  const th = "dark:bg-slate-600 bg-slate-100 font-semibold dark:text-white text-slate-700 uppercase text-xs tracking-wider px-6 py-4 border-b dark:border-slate-500 border-slate-200 shadow-sm"
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_4px_6px_-1px_rgb(0,0,0,0.1)] border border-slate-200 overflow-hidden">
+    <div className="dark:bg-slate-700 bg-white rounded-xl shadow-xl border dark:border-slate-600 border-slate-200 overflow-hidden">
       <div className="overflow-x-auto" aria-label="Individual sequences table wrapper">
         <table className="w-full min-w-[920px] border-collapse text-left">
           <caption className="sr-only">Individual sequences with metrics and source links</caption>
@@ -33,7 +33,7 @@ export default function SequencesTable({ sequences, loading, availableYears, yea
                       value={year}
                       onChange={e => onYearChange(e.target.value)}
                       aria-label="Filter sequences by collection year"
-                      className="px-2 py-1 rounded border border-slate-200 text-xs font-medium text-slate-700 bg-white cursor-pointer outline-none normal-case tracking-normal focus-visible:ring-2 focus-visible:ring-cyan-400"
+                      className="px-2 py-1 rounded border dark:border-slate-500 border-slate-200 text-xs font-medium dark:text-slate-100 text-slate-700 dark:bg-slate-600 bg-white cursor-pointer outline-none normal-case tracking-normal focus-visible:ring-2 focus-visible:ring-cyan-400"
                     >
                       <option value="">All Years</option>
                       {availableYears.map(y => (
@@ -56,26 +56,26 @@ export default function SequencesTable({ sequences, loading, availableYears, yea
               </tr>
             ) : !sequences?.length ? (
               <tr>
-                <td colSpan={8} className="px-6 py-10 text-center text-slate-400">No sequences found.</td>
+                <td colSpan={8} className="px-6 py-10 text-center dark:text-slate-400 text-slate-400">No sequences found.</td>
               </tr>
             ) : sequences.map(s => (
-              <tr key={s.accession} className="border-b border-slate-200 last:border-0 hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4">
+              <tr key={s.accession} className="border-b dark:border-slate-600 border-slate-100 last:border-0 dark:hover:bg-slate-600/50 hover:bg-slate-50 transition-colors">
+                <td className="px-6 py-[18px]">
                   <button
                     onClick={() => onSequenceClick(s)}
                     aria-label={`Open details for sequence ${s.accession}`}
-                    className="font-mono text-blue-600 font-semibold text-[0.95rem] bg-transparent border-none cursor-pointer p-0 underline decoration-transparent hover:decoration-blue-600 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="font-mono dark:text-cyan-400 text-cyan-600 font-semibold text-[0.95rem] bg-transparent border-none cursor-pointer p-0 underline decoration-transparent dark:hover:decoration-cyan-400 hover:decoration-cyan-600 transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
                   >
                     {s.accession}
                   </button>
                 </td>
-                <td className="px-6 py-4 text-[0.95rem]">{s.country ?? '—'}</td>
-                <td className="px-6 py-4 text-[0.95rem] whitespace-nowrap">{s.collection_date ?? '—'}</td>
-                <td className="px-6 py-4 text-[0.95rem]">{s.metrics?.length ?? '—'}</td>
-                <td className="px-6 py-4 text-[0.95rem]">{fmt(s.metrics?.entropy)}</td>
-                <td className="px-6 py-4 text-[0.95rem]">{fmt(s.metrics?.gc_content)}</td>
-                <td className="px-6 py-4 text-[0.95rem]">{fmt(s.metrics?.melting_temp)}</td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600">{s.country ?? '—'}</td>
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600 whitespace-nowrap">{s.collection_date ?? '—'}</td>
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600">{s.metrics?.length ?? '—'}</td>
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600">{fmt(s.metrics?.entropy)}</td>
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600">{fmt(s.metrics?.gc_content)}</td>
+                <td className="px-6 py-[18px] text-[0.95rem] dark:text-slate-300 text-slate-600">{fmt(s.metrics?.melting_temp)}</td>
+                <td className="px-6 py-[18px]">
                   <SourceLink sourceDb={s.source_db} genomeId={s.genome_id} accession={s.accession} />
                 </td>
               </tr>
