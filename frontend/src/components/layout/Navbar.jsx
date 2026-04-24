@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import logoImg from '../../assets/hvgd-logo.png'
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -51,15 +52,20 @@ export default function Navbar() {
 
   return (
     <nav ref={navRef} className="dark:bg-[#0b1326]/80 bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b dark:border-slate-700/20 border-slate-200/50 shadow-[0_0_40px_rgba(0,0,0,0.2)]" aria-label="Main navigation">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-3 max-w-screen-2xl mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-2 max-w-screen-2xl mx-auto">
         <div className="flex items-center justify-between gap-3">
+          
           <button
             onClick={() => goTo('/')}
             type="button"
             aria-label="Go to home page"
-            className="text-2xl font-bold tracking-tight dark:text-slate-100 text-slate-900 font-[Space_Grotesk,system-ui,sans-serif] bg-transparent border-none cursor-pointer hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-md"
+            className="flex items-center shrink-0 h-10 md:h-12 bg-transparent border-none cursor-pointer hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-md"
           >
-            HVGD
+            <img 
+              src={logoImg} 
+              alt="HVGD Logo" 
+              className="h-full w-auto object-contain scale-[1.8] md:scale-[2.2] origin-left" 
+            />
           </button>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">

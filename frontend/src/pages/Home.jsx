@@ -115,37 +115,35 @@ function SpeciesCard({ species, onClick }) {
       onClick={onClick}
       type="button"
       aria-label={`Open details for ${species.species}`}
-      className="group relative overflow-hidden dark:bg-slate-800/80 bg-slate-900/40 backdrop-blur-xl p-6 rounded-xl border dark:border-slate-700/30 border-slate-700/40 hover:-translate-y-2 hover:border-cyan-400/40 transition-all duration-300 cursor-pointer shadow-[0_0_30px_rgba(0,0,0,0.18)] text-left w-full focus-visible:ring-2 focus-visible:ring-cyan-400"
+      className="group relative overflow-hidden dark:bg-slate-800 bg-white p-6 rounded-xl border dark:border-slate-700/60 border-slate-200 hover:-translate-y-2 hover:border-cyan-400/40 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md text-left w-full focus-visible:ring-2 focus-visible:ring-cyan-400"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="relative">
         <div className="flex justify-between items-start mb-8">
-          <div className="w-12 h-12 bg-cyan-400/10 text-cyan-400 rounded-full flex items-center justify-center text-xl">
+          <div className="w-12 h-12 bg-cyan-50 dark:bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 rounded-full flex items-center justify-center text-xl">
             🦠
           </div>
-          <span className="dark:bg-slate-700/60 bg-slate-100/10 px-2 py-1 rounded text-[10px] dark:text-slate-400 text-slate-300 font-semibold uppercase tracking-wider">
+          <span className="dark:bg-slate-700/60 bg-slate-100 px-2 py-1 rounded text-[10px] dark:text-slate-400 text-slate-500 font-semibold uppercase tracking-wider">
             Species
           </span>
         </div>
 
-        <h5 className="text-lg font-bold dark:text-slate-100 text-slate-100 mb-1 italic">
+        <h5 className="text-lg font-bold dark:text-slate-100 text-slate-900 mb-1 italic">
           {species.species}
         </h5>
 
-        <p className="text-xs dark:text-slate-400 text-slate-300/80 mb-6">
+        <p className="text-xs dark:text-slate-400 text-slate-500 mb-6">
           {species.family ?? '—'}
         </p>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold dark:text-slate-100 text-slate-100">
+          <span className="text-2xl font-bold dark:text-slate-100 text-slate-900">
             {species.sequence_count?.toLocaleString()}
           </span>
           <span className="text-[10px] uppercase font-semibold dark:text-slate-500 text-slate-400 tracking-wider">
             Samples
           </span>
         </div>
-
-
       </div>
     </button>
   )
@@ -206,32 +204,32 @@ export default function Home() {
       </section>
 
       {/* CONTENTOR GLOBAL PARA A COR DE FUNDO UNIFICADA */}
-      <div className="dark:bg-slate-950/40 bg-slate-100/40">
+      <div className="dark:bg-slate-950/40 bg-slate-50/50">
         
         {/* STATS */}
         <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 relative z-20 pb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="dark:bg-slate-800 bg-white p-8 rounded-xl border-l-4 border-cyan-400 shadow-xl">
+            <div className="dark:bg-slate-800 bg-white p-8 rounded-xl border-l-4 border-cyan-400 shadow-sm dark:shadow-xl">
               <p className="text-xs uppercase tracking-[0.2em] dark:text-slate-400 text-slate-500 mb-2 font-semibold">
                 Human Viral Species
               </p>
               <h2 className="font-[Space_Grotesk,system-ui,sans-serif] text-5xl font-bold dark:text-slate-100 text-slate-900">
                 {data?.total_species?.toLocaleString()}
               </h2>
-              <div className="mt-4 flex items-center gap-2 text-emerald-400 text-sm">
+              <div className="mt-4 flex items-center gap-2 text-emerald-500 dark:text-emerald-400 text-sm">
                 <span>↗</span>
                 <span>Species catalogued in the database</span>
               </div>
             </div>
 
-            <div className="dark:bg-slate-800 bg-white p-8 rounded-xl border-l-4 border-emerald-400 shadow-xl">
+            <div className="dark:bg-slate-800 bg-white p-8 rounded-xl border-l-4 border-emerald-400 shadow-sm dark:shadow-xl">
               <p className="text-xs uppercase tracking-[0.2em] dark:text-slate-400 text-slate-500 mb-2 font-semibold">
                 Genomic Sequences
               </p>
               <h2 className="font-[Space_Grotesk,system-ui,sans-serif] text-5xl font-bold dark:text-slate-100 text-slate-900">
                 {data?.total_sequences?.toLocaleString()}
               </h2>
-              <div className="mt-4 flex items-center gap-2 text-emerald-400 text-sm">
+              <div className="mt-4 flex items-center gap-2 text-emerald-500 dark:text-emerald-400 text-sm">
                 <span>↗</span>
                 <span>Sequences stored in the database</span>
               </div>
@@ -250,10 +248,10 @@ export default function Home() {
               onClick={() => navigate('/species')}
               type="button"
               aria-label="Open repository explorer"
-              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/20 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/60 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-lg bg-cyan-400/10 flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-lg bg-cyan-50 dark:bg-cyan-400/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
                   🔍
                 </div>
                 <h4 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold dark:text-slate-100 text-slate-900 mb-3">
@@ -262,7 +260,7 @@ export default function Home() {
                 <p className="dark:text-slate-400 text-slate-500 text-sm leading-relaxed mb-8">
                   Navigate the deep architecture of viral genomes with our advanced search and visualization suite.
                 </p>
-                <span className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+                <span className="text-cyan-600 dark:text-cyan-400 font-bold text-sm flex items-center gap-2">
                   Explore Database <span>→</span>
                 </span>
               </div>
@@ -272,10 +270,10 @@ export default function Home() {
               onClick={genomesApi.downloadAllFasta}
               type="button"
               aria-label="Download complete FASTA dataset"
-              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/20 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/60 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-lg bg-emerald-400/10 flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-emerald-400/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
                   ⬇
                 </div>
                 <h4 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold dark:text-slate-100 text-slate-900 mb-3">
@@ -284,7 +282,7 @@ export default function Home() {
                 <p className="dark:text-slate-400 text-slate-500 text-sm leading-relaxed mb-8">
                   Download the complete curated viral genome collection for downstream research workflows.
                 </p>
-                <span className="text-emerald-400 font-bold text-sm flex items-center gap-2">
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm flex items-center gap-2">
                   Export Dataset <span>↓</span>
                 </span>
               </div>
@@ -294,10 +292,10 @@ export default function Home() {
               onClick={() => navigate('/analysis')}
               type="button"
               aria-label="Open FASTA analysis tool"
-              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/20 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="group relative dark:bg-slate-800 bg-white rounded-xl p-8 overflow-hidden dark:hover:bg-slate-700/80 hover:bg-slate-50 transition-all duration-500 cursor-pointer border dark:border-slate-700/60 border-slate-200 shadow-sm text-left focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-lg bg-purple-400/10 flex items-center justify-center text-purple-300 mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-lg bg-purple-50 dark:bg-purple-400/10 flex items-center justify-center text-purple-600 dark:text-purple-300 mb-6 group-hover:scale-110 transition-transform">
                   📊
                 </div>
                 <h4 className="font-[Space_Grotesk,system-ui,sans-serif] text-2xl font-bold dark:text-slate-100 text-slate-900 mb-3">
@@ -306,7 +304,7 @@ export default function Home() {
                 <p className="dark:text-slate-400 text-slate-500 text-sm leading-relaxed mb-8">
                   Upload your sequencing data for immediate taxonomic identification and comparative analysis.
                 </p>
-                <span className="text-purple-300 font-bold text-sm flex items-center gap-2">
+                <span className="text-purple-600 dark:text-purple-300 font-bold text-sm flex items-center gap-2">
                   Begin Analysis <span>↑</span>
                 </span>
               </div>
@@ -328,7 +326,7 @@ export default function Home() {
               </div>
               <button
                 onClick={() => navigate('/species')}
-                className="text-cyan-400 text-sm uppercase tracking-widest border-b border-cyan-400 pb-1 hover:text-cyan-300 hover:border-cyan-300 transition-all cursor-pointer"
+                className="text-cyan-600 dark:text-cyan-400 text-sm uppercase tracking-widest border-b border-cyan-600 dark:border-cyan-400 pb-1 hover:text-cyan-500 dark:hover:text-cyan-300 transition-all cursor-pointer"
               >
                 View all database
               </button>
@@ -351,7 +349,7 @@ export default function Home() {
         {/* INTEGRATIONS */}
         <section className="py-20 md:py-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-screen-2xl mx-auto flex flex-col items-center">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-cyan-400 mb-12 font-semibold text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-cyan-600 dark:text-cyan-400 mb-12 font-semibold text-center drop-shadow-[0_0_10px_rgba(34,211,238,0.35)]">
               Official Data Pipeline Integration
             </p>
 
@@ -366,14 +364,14 @@ export default function Home() {
                   href={src.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative overflow-hidden rounded-xl border border-slate-700/40 bg-slate-800/70 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:bg-slate-800/90"
+                  className="group relative overflow-hidden rounded-xl border dark:border-slate-700/60 border-slate-200 dark:bg-slate-800 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-700/80"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative">
-                    <h4 className="mb-2 text-cyan-400 text-[1.25rem] font-extrabold text-center">
+                    <h4 className="mb-2 text-cyan-600 dark:text-cyan-400 text-[1.25rem] font-extrabold text-center">
                       {src.name}
                     </h4>
-                    <p className="text-center text-slate-400 text-[0.9rem]">
+                    <p className="text-center text-slate-600 dark:text-slate-400 text-[0.9rem]">
                       {src.desc}
                     </p>
                   </div>
@@ -385,7 +383,7 @@ export default function Home() {
 
       </div> {/* FECHO DO CONTENTOR GLOBAL */}
 
-      <footer className="dark:bg-slate-700/90 bg-slate-200/90 w-full border-t dark:border-slate-600 border-slate-300">
+      <footer className="dark:bg-[#0b1326] bg-slate-50 w-full border-t dark:border-slate-800 border-slate-200">
         <div className="max-w-screen-2xl mx-auto px-12">
           <div className="py-8 flex flex-wrap items-center justify-center gap-16 md:gap-24">
             <img
@@ -400,13 +398,13 @@ export default function Home() {
             />
           </div>
           <div className="pt-2 pb-10 text-center">
-            <p className="font-[Space_Grotesk,system-ui,sans-serif] text-[0.72rem] md:text-xs font-bold uppercase tracking-[0.28em] text-cyan-500">
+            <p className="font-[Space_Grotesk,system-ui,sans-serif] text-[0.72rem] md:text-xs font-bold uppercase tracking-[0.28em] text-cyan-600 dark:text-cyan-500">
               HVGD
             </p>
             <p className="mt-2 font-[Manrope,system-ui,sans-serif] text-base md:text-lg font-medium tracking-[0.02em] dark:text-slate-100 text-slate-800">
               Human Viral Genome Database
             </p>
-            <div className="mx-auto mt-4 h-px w-24 dark:bg-slate-500/70 bg-slate-400/70" />
+            <div className="mx-auto mt-4 h-px w-24 dark:bg-slate-800 bg-slate-300" />
           </div>
         </div>
       </footer>

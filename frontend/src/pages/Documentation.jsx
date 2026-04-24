@@ -14,7 +14,7 @@ const visualizations = [
   {
     title: 'Entropy',
     description:
-      'This visualization represents the temporal variation of entropy-related values for a given species. It supports the analysis of changes in sequence complexity over time and may help identify periods of greater stability or increased variability in the genomic structure of the sequences.',
+      'This visualization represents the temporal variation of entropy-related values for a given species. Entropy is computed using the AltaiR toolkit, an alignment-free method that estimates sequence complexity based on compression principles. It supports the analysis of changes in sequence complexity over time and may help identify periods of greater stability or increased variability in the genomic structure of the sequences.',
   },
   {
     title: 'Melting Temp',
@@ -56,6 +56,20 @@ const analysisMetrics = [
   },
 ]
 
+const compression = [
+  {
+    title: 'Dataset Compression',
+    description:
+      'To facilitate efficient storage and distribution of large-scale genomic data, compression techniques were evaluated using the FABench framework. Several methods were benchmarked considering compression ratio, compression time, and decompression performance. Following these tests, the Nucleotide Archival Format (NAF) will be used due to its balanced performance, particularly its fast decompression speed, which is critical for enabling rapid access to the dataset.',
+  },
+]
+
+const dissertation = {
+  title: 'Human Virus Genomics and Distribution',
+  author: 'Ana Rita Gomes',
+  supervisor: 'Dr. Diogo Pratas',
+}
+
 const references = [
   {
     title: 'AltaiR: a C toolkit for alignment-free and temporal analysis of multi-FASTA data',
@@ -69,13 +83,25 @@ const references = [
     journal: 'GigaScience, Volume 9, Issue 8, 2020',
     link: 'https://academic.oup.com/gigascience/article/9/8/giaa086/5894824',
   },
+  {
+    title: 'Intra-host genomic diversity and integration landscape of human tissue-resident DNA virome',
+    authors: 'Lari Pyöriä, Diogo Pratas, Mari Toppinen, Peter Simmonds, Klaus Hedman, Antti Sajantila, Maria F Perdomo',
+    journal: 'Nucleic Acids Research, Volume 52, Issue 21, 2024',
+    link: 'https://academic.oup.com/nar/article/52/21/13073/7831089',
+  },
+  {
+    title: 'Unmasking the tissue-resident eukaryotic DNA virome in humans',
+    authors: 'Lari Pyöriä, Diogo Pratas, Mari Toppinen, Klaus Hedman, Antti Sajantila, Maria F Perdomo',
+    journal: 'Nucleic Acids Research, Volume 51, Issue 7, 2023',
+    link: 'https://academic.oup.com/nar/article/51/7/3223/7084602',
+  },
+  {
+    title: 'Clinical and biological insights from viral genome sequencing',
+    authors: 'Charlotte J Houldcroft, Mathew A Beale, Judith Breuer',
+    journal: 'Nature Reviews Microbiology, Volume 15, 2017',
+    link: 'https://www.nature.com/articles/nrmicro.2016.182',
+  },
 ]
-
-const dissertation = {
-  title: 'Human Virus Genomics and Distribution',
-  author: 'Ana Rita Gomes',
-  supervisor: 'Dr. Diogo Pratas',
-}
 
 function SectionTitle({ eyebrow, title, description }) {
   return (
@@ -95,15 +121,36 @@ function SectionTitle({ eyebrow, title, description }) {
   )
 }
 
-function InfoCard({ title, description }) {
+function InfoCard({ title, description, link, linkLabel, horizontal }) {
   return (
-    <article className="rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/40 sm:p-6">
-      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 sm:text-lg">
-        {title}
-      </h3>
-      <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]">
-        {description}
-      </p>
+    <article
+      className={`rounded-2xl border border-slate-200/80 bg-white/80 shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/40 ${
+        horizontal
+          ? 'flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:gap-8 md:p-8'
+          : 'p-5 sm:p-6'
+      }`}
+    >
+      <div className={horizontal ? 'max-w-4xl' : ''}>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 sm:text-lg">
+          {title}
+        </h3>
+        <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]">
+          {description}
+        </p>
+      </div>
+
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`inline-flex text-sm font-medium text-cyan-500 transition-colors hover:text-cyan-400 ${
+            horizontal ? 'whitespace-nowrap self-start md:self-center' : 'mt-4'
+          }`}
+        >
+          {linkLabel || 'Learn more'}
+        </a>
+      )}
     </article>
   )
 }
@@ -173,8 +220,9 @@ export default function Documentation() {
               <span className="font-semibold text-slate-800 dark:text-slate-100">
                 Analysis
               </span>{' '}
-              section. It also includes relevant publications from the research group and
-              the associated dissertation.
+              section. It also includes relevant publications from the research group, the
+              associated dissertation, and additional information about the compression strategy
+              adopted for dataset distribution.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -199,8 +247,8 @@ export default function Documentation() {
                   Research Outputs
                 </p>
                 <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  Relevant publications from the research group and the dissertation associated
-                  with this work.
+                  Relevant publications from the research group, the dissertation associated
+                  with this work, and technical notes on dataset compression.
                 </p>
               </div>
             </div>
@@ -211,7 +259,8 @@ export default function Documentation() {
               <SectionTitle
                 eyebrow="Visualizations"
                 title="Graph Descriptions"
-                description="These visualizations help interpret the distribution, composition, and temporal behaviour of the sequences available for each species."
+                description="
+                All graphs presented below are pre-calculated. These visualizations help interpret the distribution, composition, and temporal behaviour of the sequences available for each species."
               />
 
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -220,6 +269,12 @@ export default function Documentation() {
                     key={item.title}
                     title={item.title}
                     description={item.description}
+                    link={
+                      item.title === 'Entropy'
+                        ? 'https://github.com/cobilab/altair'
+                        : undefined
+                    }
+                    linkLabel={item.title === 'Entropy' ? 'View AltaiR' : undefined}
                   />
                 ))}
               </div>
@@ -245,20 +300,22 @@ export default function Documentation() {
 
             <section className="rounded-[2rem] border border-slate-200 bg-white/85 p-7 shadow-lg backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-800/80 sm:p-8 lg:p-10">
               <SectionTitle
-                eyebrow="References"
-                title="Related Publications"
-                description="Relevant publications related to the methods and research context of this platform."
+                eyebrow="Compression"
+                title="Dataset Compression Strategy"
+                description="Overview of the methods used to compress and distribute the genomic dataset."
               />
 
-              <div className="grid gap-5 md:grid-cols-2">
-                {references.map((item) => (
-                  <ReferenceCard
-                    key={item.link}
-                    title={item.title}
-                    authors={item.authors}
-                    journal={item.journal}
-                    link={item.link}
-                  />
+              <div className="space-y-5">
+                {compression.map((item) => (
+                  <div key={item.title} className="w-full">
+                    <InfoCard
+                      title={item.title}
+                      description={item.description}
+                      link="https://github.com/cobilab/FABench"
+                      linkLabel="View FABench"
+                      horizontal
+                    />
+                  </div>
                 ))}
               </div>
             </section>
@@ -276,6 +333,26 @@ export default function Documentation() {
                   author={dissertation.author}
                   supervisor={dissertation.supervisor}
                 />
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-slate-200 bg-white/85 p-7 shadow-lg backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-800/80 sm:p-8 lg:p-10">
+              <SectionTitle
+                eyebrow="References"
+                title="Related Publications"
+                description="Relevant publications related to the methods and research context of this platform."
+              />
+
+              <div className="grid gap-5 md:grid-cols-2">
+                {references.map((item) => (
+                  <ReferenceCard
+                    key={item.link}
+                    title={item.title}
+                    authors={item.authors}
+                    journal={item.journal}
+                    link={item.link}
+                  />
+                ))}
               </div>
             </section>
           </div>

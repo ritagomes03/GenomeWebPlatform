@@ -25,6 +25,7 @@ FIELD_ALIASES = {
     "completeness_flag": "completenessFlag",
     "completeness": "completenessFlag",
     "source": "source",
+    "other": "other",
 }
 
 _ACCESSION_RE = re.compile(r'^[A-Z]{1,2}_?[A-Z0-9]{4,}\.\d+|^[A-Z]{2}\d{6,}')
@@ -48,15 +49,17 @@ def _normalize_field(raw: str) -> str:
     key = raw.strip().lower().replace("-", "_")
     return FIELD_ALIASES.get(key, key.replace(" ", "_"))
 
-
 def _parse_meta_order(meta_order_str: str) -> list[str | None]:
     raw_fields = meta_order_str.split(",")
     fields = []
     for f in raw_fields:
-        if not f.strip():
-            fields.append(None)          # posição "other" — ignorar
+        stripped = f.strip()
+        if not stripped:
+            fields.append(None)
+        elif stripped.lower() == 'other':   # ← trata 'other' como posição a ignorar
+            fields.append(None)
         else:
-            fields.append(_normalize_field(f))
+            fields.append(_normalize_field(stripped))
 
     non_empty = [f for f in fields if f is not None]
     if not non_empty:

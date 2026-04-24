@@ -20,39 +20,65 @@ const FIELD_LABELS = {
   source:           'Source',
 }
 
-// Devolve o label para qualquer field, incluindo other_1, other_2...
 const getLabel = (field) => {
   if (field.startsWith('other_')) return 'Other'
   return FIELD_LABELS[field] ?? field
 }
 
+const INPUT_MODES = { FILE: 'file', TEXT: 'text' }
+
+const FASTA_PLACEHOLDER = `>MN908947|Betacoronavirus|Severe acute respiratory syndrome virus 2|Coronaviridae|complete
+ATTAAAGGTTTATACCTTCCCAGGTAACAAACCAACCAACTTTCGATCTCTTGTAGATCT
+>NC_001803|Orthomyxovirus|Influenza A virus|Orthomyxoviridae|complete
+AGCAAAAGCAGGGGATAATTCTATTAACCATGAAGACTATCATTGCTTTGAGCTACATTT
+>KY352407|Flavivirus|Zika virus|Flaviviridae|partial
+AGTTGTTGATCTGTGTGAATCAGACTGCGACAGTTCGAGTTTGAAGCGAAAGCTAGCAAC`
+
 
 export default function SequenceAnalysis() {
   const navigate = useNavigate()
 
+  const [inputMode, setInputMode]       = useState(INPUT_MODES.FILE)
   const [file, setFile]                 = useState(null)
+  const [fastaText, setFastaText]       = useState('')
   const [results, setResults]           = useState(null)
   const [metaInfo, setMetaInfo]         = useState(null)
   const [cleanedFasta, setCleanedFasta] = useState(null)
   const [loading, setLoading]           = useState(false)
   const [error, setError]               = useState(null)
 
-  const [selectedFields, setSelectedFields]   = useState([])
+  const [selectedFields, setSelectedFields] = useState([])
 
   const { data: analysisFields } = useAnalysisFields()
   const availableFields = analysisFields?.fields ?? []
 
-  // other_1, other_2 -> envia "other" ao backend
   const metaOrder = selectedFields
-  .map(f => f.startsWith('other_') ? 'other' : f)
-  .join(',')
+    .map(f => f.startsWith('other_') ? 'other' : f)
+    .join(',')
+
+  // Devolve o File a enviar — ficheiro carregado ou texto convertido em File
+  const getEffectiveFile = () => {
+    if (inputMode === INPUT_MODES.FILE) return file
+    if (!fastaText.trim()) return null
+    return new File([fastaText], 'pasted_sequence.fasta', { type: 'text/plain' })
+  }
+
+  const canSubmit = inputMode === INPUT_MODES.FILE ? !!file : !!fastaText.trim()
+
+  const switchMode = (mode) => {
+    setInputMode(mode)
+    setFile(null)
+    setFastaText('')
+    setResults(null)
+    setCleanedFasta(null)
+    setError(null)
+  }
 
   const addField = (field) => {
     if (!selectedFields.includes(field))
       setSelectedFields(prev => [...prev, field])
   }
 
-  // "Other" pode ser adicionado múltiplas vezes com ID único
   const addOther = () => {
     const count = selectedFields.filter(f => f.startsWith('other_')).length
     setSelectedFields(prev => [...prev, `other_${count + 1}`])
@@ -73,13 +99,14 @@ export default function SequenceAnalysis() {
   }
 
   const handleSubmit = async () => {
-    if (!file) return
+    const effectiveFile = getEffectiveFile()
+    if (!effectiveFile) return
     setLoading(true)
     setError(null)
     setResults(null)
     setCleanedFasta(null)
     try {
-      const data = await genomesApi.analyzeFasta(file, metaOrder)
+      const data = await genomesApi.analyzeFasta(effectiveFile, metaOrder)
       if (!data?.results) throw new Error('Formato de resposta inválido.')
       setResults(data.results)
       setMetaInfo(data.meta)
@@ -118,8 +145,10 @@ export default function SequenceAnalysis() {
 
   const downloadFasta = () => {
     if (!cleanedFasta) return
-    const name = file?.name?.replace(/\.[^/.]+$/, '') ?? 'sequences'
-    triggerDownload(new Blob([cleanedFasta], { type: 'text/plain;charset=utf-8;' }), `uniformized_${name}.fasta`)
+    const baseName = inputMode === INPUT_MODES.FILE
+      ? file?.name?.replace(/\.[^/.]+$/, '') ?? 'sequences'
+      : 'pasted_sequence'
+    triggerDownload(new Blob([cleanedFasta], { type: 'text/plain;charset=utf-8;' }), `uniformized_${baseName}.fasta`)
   }
 
   // "other_X" nunca aparece nos disponíveis — tem botão próprio
@@ -150,7 +179,7 @@ export default function SequenceAnalysis() {
             Sequence Analysis
           </h1>
           <p className="dark:text-slate-400 text-slate-500 text-lg max-w-3xl">
-            Upload a FASTA file to calculate sequence length, base composition, GC content and melting temperature.
+            Upload a FASTA file or paste your sequences directly to calculate length, base composition, GC content and melting temperature.
           </p>
         </div>
       </section>
@@ -196,7 +225,6 @@ export default function SequenceAnalysis() {
                     </button>
                   ))}
 
-                  {/* Botão Other — sempre disponível, pode ser clicado várias vezes */}
                   <button
                     onClick={addOther}
                     aria-label="Add Other field"
@@ -272,43 +300,116 @@ export default function SequenceAnalysis() {
             )}
           </div>
 
+          {/* MODE TOGGLE */}
+          <div className="mb-6">
+            <p className="text-sm font-semibold dark:text-slate-300 text-slate-700 mb-3">Input Method</p>
+            <div className="inline-flex rounded-xl border dark:border-slate-700/40 border-slate-200 overflow-hidden">
+              <button
+                onClick={() => switchMode(INPUT_MODES.FILE)}
+                className={`px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                  inputMode === INPUT_MODES.FILE
+                    ? 'bg-cyan-400/15 text-cyan-400'
+                    : 'dark:bg-slate-900/40 bg-slate-50 dark:text-slate-400 text-slate-500 hover:text-cyan-400'
+                }`}
+              >
+                Upload File
+              </button>
+              <button
+                onClick={() => switchMode(INPUT_MODES.TEXT)}
+                className={`px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400 border-l dark:border-slate-700/40 border-slate-200 ${
+                  inputMode === INPUT_MODES.TEXT
+                    ? 'bg-cyan-400/15 text-cyan-400'
+                    : 'dark:bg-slate-900/40 bg-slate-50 dark:text-slate-400 text-slate-500 hover:text-cyan-400'
+                }`}
+              >
+                Paste / Type
+              </button>
+            </div>
+          </div>
+
           {/* FILE INPUT */}
-          <div className="space-y-4">
-            <label className="block">
-              <span className="sr-only">Choose FASTA file</span>
-              <input
-                type="file"
-                accept=".fasta,.fa,.fna,.ffn,.faa,.frn,.txt"
-                onChange={(e) => setFile(e.target.files[0])}
-                className="block w-full text-sm dark:text-slate-400 text-slate-500
-                  file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0
-                  file:text-sm file:font-semibold file:bg-cyan-400/10 file:text-cyan-400
-                  hover:file:bg-cyan-400/20
-                  border border-dashed dark:border-slate-600 border-slate-300 rounded-xl p-4
-                  dark:bg-slate-900/40 bg-slate-50
-                  cursor-pointer outline-none"
+          {inputMode === INPUT_MODES.FILE && (
+            <div className="space-y-4">
+              <label className="block">
+                <span className="sr-only">Choose FASTA file</span>
+                <input
+                  type="file"
+                  accept=".fasta,.fa,.fna,.ffn,.faa,.frn,.txt"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="block w-full text-sm dark:text-slate-400 text-slate-500
+                    file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0
+                    file:text-sm file:font-semibold file:bg-cyan-400/10 file:text-cyan-400
+                    hover:file:bg-cyan-400/20
+                    border border-dashed dark:border-slate-600 border-slate-300 rounded-xl p-4
+                    dark:bg-slate-900/40 bg-slate-50
+                    cursor-pointer outline-none"
+                />
+              </label>
+
+              {file && (
+                <p className="text-sm dark:text-slate-300 text-slate-600">
+                  Selected file: <span className="text-cyan-400 font-semibold">{file.name}</span>
+                  <span className="dark:text-slate-600 text-slate-400 ml-2">({(file.size / 1024).toFixed(1)} KB)</span>
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* TEXT INPUT */}
+          {inputMode === INPUT_MODES.TEXT && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs dark:text-slate-500 text-slate-400 uppercase tracking-wide">
+                  Paste or type your sequences in FASTA format
+                </p>
+                {fastaText.trim() && (
+                  <button
+                    onClick={() => setFastaText('')}
+                    className="text-xs text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <textarea
+                value={fastaText}
+                onChange={(e) => setFastaText(e.target.value)}
+                placeholder={FASTA_PLACEHOLDER}
+                spellCheck={false}
+                rows={10}
+                aria-label="FASTA sequence input"
+                className="w-full font-mono text-sm rounded-xl border dark:border-slate-600 border-slate-300
+                  dark:bg-slate-900/60 bg-slate-50
+                  dark:text-slate-200 text-slate-700
+                  dark:placeholder-slate-700 placeholder-slate-400
+                  p-4 resize-y outline-none
+                  focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/30
+                  transition-colors"
               />
-            </label>
+              {fastaText.trim() && (
+                <p className="text-xs dark:text-slate-500 text-slate-400">
+                  {fastaText.split('\n').filter(l => l.startsWith('>')).length} sequence header{fastaText.split('\n').filter(l => l.startsWith('>')).length !== 1 ? 's' : ''} detected
+                  <span className="ml-2 dark:text-slate-600 text-slate-400">·</span>
+                  <span className="ml-2">{(new Blob([fastaText]).size / 1024).toFixed(1)} KB</span>
+                </p>
+              )}
+            </div>
+          )}
 
-            {file && (
-              <p className="text-sm dark:text-slate-300 text-slate-600">
-                Selected file: <span className="text-cyan-400 font-semibold">{file.name}</span>
-                <span className="dark:text-slate-600 text-slate-400 ml-2">({(file.size / 1024).toFixed(1)} KB)</span>
-              </p>
-            )}
-
+          {/* SUBMIT */}
+          <div className="mt-6">
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading || !file}
+              disabled={loading || !canSubmit}
               aria-label="Run sequence analysis"
               className={`px-6 py-3 rounded-xl font-semibold transition-all cursor-pointer ${
-                loading || !file
+                loading || !canSubmit
                   ? 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
                   : 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-slate-950 hover:brightness-110 shadow-lg'
               }`}
             >
-              {loading ? 'Analyzing…' : 'Analyze File'}
+              {loading ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
 

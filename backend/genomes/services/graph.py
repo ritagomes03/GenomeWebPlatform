@@ -25,11 +25,10 @@ def build_graph_files(root_path, folder_name):
         return {}
 
     path_graphs = root_path / 'graphs' / folder_name
-    path_semout = root_path / 'graphs_semout' / folder_name
 
     return {
-        'length': path_semout / 'lengthgraph' / 'sem_tendencia' / folder_name / 'length_histograms' / f'{folder_name}_length_histogram.pdf',
-        'gc': path_semout / 'gcContentGraphs' / 'sem_tendencia' / f'{folder_name}_gc_histogram.pdf',
+        'length': path_graphs / 'length_histograms' / 'no_outliers' / f'{folder_name}_length_histogram.pdf',
+        'gc': path_graphs / 'gcContentGraphs' / f'{folder_name}_gc_histogram.pdf',
         'entropy': path_graphs / 'entropyGraphs' / f'{folder_name}_entropy.pdf',
         'melting_temp': path_graphs / 'meltingTempGraphs' / f'{folder_name}_melting_temp.pdf',
         'bases_tempo': path_graphs / 'basesTempoGraphs' / f'{folder_name}_bases_tempo.pdf',
