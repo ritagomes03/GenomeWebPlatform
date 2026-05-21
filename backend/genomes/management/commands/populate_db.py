@@ -65,9 +65,12 @@ class Command(BaseCommand):
             with transaction.atomic():
                 # Usar SQL direto (TRUNCATE) evita overhead do ORM em grandes volumes.
                 with connection.cursor() as cursor:
-                    cursor.execute('TRUNCATE TABLE genomes_sequencemetrics CASCADE;')
-                    cursor.execute('TRUNCATE TABLE genomes_sequence CASCADE;')
-                    cursor.execute('TRUNCATE TABLE genomes_taxonomy CASCADE;')
+
+                    cursor.execute('SET FOREIGN_KEY_CHECKS=0;')
+                    cursor.execute('TRUNCATE TABLE genomes_sequencemetrics;')
+                    cursor.execute('TRUNCATE TABLE genomes_sequence;')
+                    cursor.execute('TRUNCATE TABLE genomes_taxonomy;')
+                    cursor.execute('SET FOREIGN_KEY_CHECKS=1;')
 
                 self.stdout.write("Reading species from metadados.csv...")
                 species_defaults = {}

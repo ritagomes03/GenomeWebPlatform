@@ -60,7 +60,7 @@ const compression = [
   {
     title: 'Dataset Compression',
     description:
-      'To facilitate efficient storage and distribution of large-scale genomic data, compression techniques were evaluated using the FABench framework. Several methods were benchmarked considering compression ratio, compression time, and decompression performance. Following these tests, the Nucleotide Archival Format (NAF) will be used due to its balanced performance, particularly its fast decompression speed, which is critical for enabling rapid access to the dataset.',
+      'To facilitate efficient storage and distribution of large-scale genomic data, compression techniques were evaluated using the FABench framework. Several methods were benchmarked according to compression ratio, compression time, and decompression performance. The Nucleotide Archival Format (NAF) initially appeared to be the most suitable option, mainly because of its favourable decompression speed, which is particularly relevant for rapid access to the dataset. However, during practical testing, NAF showed limitations when applied to very large genomic databases. For this reason, the final implementation adopts ZIP, due to its universal compatibility and ease of use, and Zstandard, which offers a suitable compromise between compression efficiency, speed, and scalability.',
   },
 ]
 
@@ -201,7 +201,7 @@ export default function Documentation() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.14),transparent_35%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.12),transparent_30%)]" />
 
-        <div className="mx-auto max-w-screen-xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-screen-2xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
           <div className="rounded-[2rem] border border-slate-200 bg-white/90 p-8 shadow-xl backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-800/85 sm:p-10 lg:p-12">
             <p className="inline-flex items-center rounded-full bg-cyan-400/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-500 dark:text-cyan-300">
               Documentation

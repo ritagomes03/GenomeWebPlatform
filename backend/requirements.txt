@@ -1,5 +1,5 @@
 Django>=5.2,<5.3
-psycopg2-binary>=2.9
+mysqlclient>=2.2.7
 gunicorn>=21.2
 djangorestframework>=3.14
 biopython>=1.83

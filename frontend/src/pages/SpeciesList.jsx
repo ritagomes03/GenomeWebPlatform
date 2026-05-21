@@ -18,7 +18,7 @@ export default function SpeciesList() {
   const [search, setSearch] = useState(initialQuery)
   const [sort, setSort] = useState('frequency')
   const [page, setPage] = useState(1)
-
+   
   useEffect(() => { window.scrollTo(0, 0) }, [])
 
   const { data, isLoading, error } = useTaxonomy({ q: search, sort, page })
@@ -134,11 +134,19 @@ export default function SpeciesList() {
                 <DownloadIcon /> CSV
               </button>
               <button
-                onClick={genomesApi.downloadAllFasta}
-                aria-label="Download all FASTA sequences"
+                onClick={genomesApi.downloadAllFastaZip}
+                aria-label="Download all FASTA sequences as ZIP"
                 className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-emerald-400/20 hover:bg-emerald-400/30 text-emerald-400 rounded-xl text-sm font-semibold border border-emerald-400/50 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
-                <DownloadIcon /> FASTA
+                <DownloadIcon /> FASTA .zip
+              </button>
+
+              <button
+                onClick={genomesApi.downloadAllFastaZstandard}
+                aria-label="Download all FASTA sequences as Zstandard"
+                className="inline-flex items-center gap-2 px-5 min-h-11 py-3 bg-violet-400/20 hover:bg-violet-400/30 text-violet-400 rounded-xl text-sm font-semibold border border-violet-400/50 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-cyan-400"
+              >
+                <DownloadIcon /> FASTA .zst
               </button>
 
               <div className="species-search flex flex-wrap md:flex-nowrap items-stretch rounded-xl overflow-hidden">

@@ -185,7 +185,7 @@ export default function SequenceAnalysis() {
       </section>
 
       {/* MAIN CONTENT */}
-      <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10 space-y-6">
+      <section className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10 space-y-6">
 
         {/* UPLOAD CARD */}
         <div className="dark:bg-slate-800/95 bg-white backdrop-blur-xl rounded-2xl border dark:border-slate-700/30 border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-8">

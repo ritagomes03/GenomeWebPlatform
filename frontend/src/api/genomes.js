@@ -59,8 +59,9 @@ export const genomesApi = {
   downloadZip:      (id)            => download(`${BASE}/taxonomy/${id}/download/`),
   downloadGraph:    (id, type)      => download(`${BASE}/taxonomy/${id}/graph/?type=${type}`),
   downloadFasta:    (accession)     => download(`${BASE}/sequences/${accession}/fasta/`),
-  downloadAllFasta: ()              => download(`${BASE}/global/fasta/`),
-  downloadMetadata: ()              => download(`${BASE}/global/metadata/`),
+  downloadAllFastaZip:       () => download(`${BASE}/global/fasta/zip/`),
+  downloadAllFastaZstandard: () => download(`${BASE}/global/fasta/zstandard/`),
+  downloadMetadata:          () => download(`${BASE}/global/metadata/`),
 
   analyzeFasta: async (file, metaOrder) => post(`${BASE}/analysis/fasta/`,     await buildForm(file, metaOrder)),
   uniformize:   async (file, metaOrder) => post(`${BASE}/analysis/uniformize/`, await buildForm(file, metaOrder)),

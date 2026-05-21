@@ -168,12 +168,31 @@ class GlobalViewSet(viewsets.ViewSet):
             ).data),
         })
 
-    @action(detail=False, methods=['get'], url_path='fasta')
-    def download_fasta(self, request):
+    @action(detail=False, methods=['get'], url_path='fasta/zip')
+    def download_fasta_zip(self, request):
         file_path = Path(settings.BASE_DIR) / 'data' / 'all_genomes_clean.fasta.zip'
+
         if not file_path.exists():
-            raise Http404('Global FASTA file not found.')
-        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_path.name)
+            raise Http404('Global FASTA ZIP file not found.')
+
+        return FileResponse(
+            open(file_path, 'rb'),
+            as_attachment=True,
+            filename=file_path.name
+        )
+
+    @action(detail=False, methods=['get'], url_path='fasta/zstandard')
+    def download_fasta_zstandard(self, request):
+        file_path = Path(settings.BASE_DIR) / 'data' / 'all_genomes_clean.fasta.zst'
+
+        if not file_path.exists():
+            raise Http404('Global FASTA Zstandard file not found.')
+
+        return FileResponse(
+            open(file_path, 'rb'),
+            as_attachment=True,
+            filename=file_path.name
+        )
 
     @action(detail=False, methods=['get'], url_path='metadata')
     def download_metadata(self, request):
