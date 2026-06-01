@@ -2,50 +2,239 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Species List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Species List | GenomeWebPlatform</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --primary-soft: #eff6ff;
+            --success: #10b981;
+            --success-hover: #059669;
             --bg: #f8fafc;
             --surface: #ffffff;
-            --text: #334155;
+            --text: #1e293b;
             --text-muted: #64748b;
             --border: #e2e8f0;
         }
 
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 40px 20px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0 0 8px 0;
-            letter-spacing: -0.025em;
+        /* Header & Navigation */
+        .header-section {
+            margin-bottom: 32px;
         }
 
-        .stats {
+        .back-nav {
+            margin-bottom: 16px;
+        }
+
+        .back-nav a {
             color: var(--text-muted);
-            margin-bottom: 24px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
             font-size: 0.95rem;
         }
 
+        .back-nav a:hover {
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.03em;
+        }
+
+        .stats-badge {
+            display: inline-flex;
+            gap: 16px;
+            background: var(--surface);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .stats-badge strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Controls Area */
+        .controls-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: var(--surface);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .sorting-controls {
+            display: flex;
+            gap: 8px;
+            font-size: 0.9rem;
+            align-items: center;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sort-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .sort-link:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .sort-link.active {
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--primary-soft);
+            border-color: #bfdbfe;
+        }
+
+        .right-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Search input */
+        .search-form {
+            display: flex;
+            position: relative;
+        }
+
+        .search-form input {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            font-size: 0.95rem;
+            outline: none;
+            width: 240px;
+            transition: border-color 0.2s;
+            background: var(--bg);
+        }
+
+        .search-form input:focus {
+            border-color: var(--primary);
+            background: var(--surface);
+        }
+
+        .search-form button {
+            border-radius: 0 10px 10px 0;
+            margin-left: 0;
+            box-shadow: none;
+        }
+
+        /* Autocomplete dropdown */
+        .suggestions-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            z-index: 50;
+            display: none;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text);
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background-color: var(--primary-soft);
+            color: var(--primary);
+            padding-left: 20px;
+        }
+
+        /* Table */
         .table-wrapper {
             background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
             overflow: hidden;
         }
@@ -59,68 +248,68 @@
         th {
             background-color: #f8fafc;
             font-weight: 600;
-            color: #475569;
+            color: var(--text-muted);
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.05em;
-            padding: 16px 24px;
+            padding: 18px 24px;
             border-bottom: 1px solid var(--border);
         }
 
         td {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
+            padding: 18px 24px;
+            border-bottom: 1px solid #f1f5f9;
             color: var(--text);
-            transition: background-color 0.15s;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: var(--primary-soft); }
 
-        tr:hover td {
-            background-color: #f1f5f9;
-        }
-
-        a {
-            color: var(--primary);
+        td a {
+            color: var(--text);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            transition: color 0.2s;
         }
 
-        a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
+        td a:hover {
+            color: var(--primary);
         }
 
+        /* Pagination */
         .pagination {
-            margin-top: 32px;
+            margin-top: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .pagination a {
-            padding: 8px 16px;
+            padding: 10px 18px;
             background: var(--surface);
             border: 1px solid var(--border);
             color: var(--text);
-            border-radius: 6px;
-            font-weight: 500;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 0.9rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .pagination a:hover {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
-            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         }
 
         .pagination span {
-            padding: 8px 16px;
+            padding: 10px 18px;
             color: var(--text-muted);
             font-size: 0.9rem;
             font-weight: 500;
@@ -130,8 +319,55 @@
 <body>
 
     <div class="container">
-        <h1>Species Database</h1>
-        <p class="stats">Total Species: <strong>{{ total_species }}</strong> &bull; Total Sequences: <strong>{{ total_sequences }}</strong></p>
+        
+        <div class="header-section">
+            <div class="back-nav">
+                <a href="{% url 'home' %}">
+                    <svg style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+            <h1>Species Database</h1>
+            <div class="stats-badge">
+                <span>Total Species: <strong>{{ total_species }}</strong></span>
+                <span>Total Sequences: <strong>{{ total_sequences }}</strong></span>
+            </div>
+        </div>
+
+        <div class="controls-wrapper">
+            <div class="sorting-controls">
+                <span>Sort by:</span>
+                <a href="?sort=frequency&q={{ search_query }}" class="sort-link {% if current_sort == 'frequency' %}active{% endif %}">Most Frequent</a>
+                <a href="?sort=az&q={{ search_query }}" class="sort-link {% if current_sort == 'az' %}active{% endif %}">A-Z</a>
+            </div>
+
+            <div class="right-controls">
+                <a href="{% url 'download_global_metadata' %}" class="btn btn-primary">
+                    <svg style="width: 18px; height: 18px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    CSV
+                </a>
+                
+                <a href="{% url 'download_global_fasta' %}" class="btn btn-success">
+                    <svg style="width: 18px; height: 18px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    FASTA
+                </a>
+                
+                <form class="search-form" method="GET" action="">
+                    <input type="hidden" name="sort" value="{{ current_sort }}">
+                    <div class="search-wrapper" style="position: relative;">
+                        <input type="text" name="q" placeholder="Search species..." value="{{ search_query }}" autocomplete="off" id="search-input">
+                        <div id="suggestions" class="suggestions-dropdown"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+        </div>
 
         <div class="table-wrapper">
             <table>
@@ -146,15 +382,20 @@
                 <tbody>
                     {% for s in page_obj %}
                     <tr>
-                        <td><a href="{% url 'species_detail' s.id %}"><em>{{ s.species }}</em></a></td>
+                        <td>
+                            <a href="{% url 'species_detail' s.id %}"><em>{{ s.species }}</em></a>
+                        </td>
                         <td>{{ s.family|default:"-" }}</td>
                         <td>{{ s.genus|default:"-" }}</td>
-                        <td>{{ s.sequence_count }}</td> 
+                        <td style="font-weight: 500;">{{ s.sequence_count }}</td> 
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                            No species found. Did the populate_db command run successfully?
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.5;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                            <br>No species found.
                         </td>
                     </tr>
                     {% endfor %}
@@ -164,18 +405,59 @@
 
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                <a href="?page=1&sort={{ current_sort }}&q={{ search_query }}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}&sort={{ current_sort }}&q={{ search_query }}">Previous</a>
             {% endif %}
 
             <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                <a href="?page={{ page_obj.next_page_number }}&sort={{ current_sort }}&q={{ search_query }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ current_sort }}&q={{ search_query }}">Last &raquo;</a>
             {% endif %}
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('search-input');
+            const dropdown = document.getElementById('suggestions');
+
+            input.addEventListener('input', async (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`{% url 'species_autocomplete' %}?q=${encodeURIComponent(query)}`);
+                    const suggestions = await res.json();
+
+                    if (suggestions.length > 0) {
+                        dropdown.innerHTML = suggestions.map(s => `<div class="suggestion-item">${s}</div>`).join('');
+                        dropdown.style.display = 'block';
+
+                        dropdown.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                input.value = item.textContent;
+                                input.closest('form').submit();
+                            });
+                        });
+                    } else {
+                        dropdown.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Error fetching suggestions:", error);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-wrapper')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

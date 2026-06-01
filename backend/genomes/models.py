@@ -32,6 +32,10 @@ class Sequence(models.Model):
     collection_date = models.DateField(blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
     source_db = models.CharField(max_length=100, blank=True, null=True)
+    
+    genome_id = models.CharField(max_length=100, blank=True, null=True)
+    molecular_type = models.CharField(max_length=100, blank=True, null=True)
+    completeness_flag = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         indexes = [

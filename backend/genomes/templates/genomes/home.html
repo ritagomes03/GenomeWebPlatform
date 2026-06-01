@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenomeWebPlatform | Viral Genomics</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-soft: #eff6ff;
+            --success: #10b981;
+            --dark: #0f172a;
+            --text-muted: #64748b;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --surface: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 100px 20px 120px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.3;
+            background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 { font-size: 3.5rem; letter-spacing: -0.03em; margin: 0; color: var(--dark); font-weight: 800; }
+        .lead { color: var(--text-muted); margin: 12px auto 40px; font-size: 1.2rem; max-width: 600px; }
+
+        /* Search & Suggestions */
+        .search-wrapper {
+            position: relative;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .search-container {
+            background: white;
+            padding: 8px;
+            border-radius: 16px;
+            display: flex;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            transition: border 0.2s;
+        }
+
+        .search-container:focus-within { border-color: var(--primary); }
+
+        .search-container input {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .btn-search {
+            background: var(--primary);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-search:hover { background: #2563eb; }
+
+        .suggestions-box {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0; right: 0;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+            max-height: 280px;
+            overflow-y: auto;
+            display: none;
+            text-align: left;
+        }
+
+        .suggestion-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s;
+            color: #334155;
+        }
+
+        .suggestion-item:hover { background: #f8fafc; color: var(--primary); padding-left: 25px; }
+
+        /* Content Sections */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: -50px;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h3 { font-size: 2.5rem; margin: 0; color: var(--primary); font-weight: 800; }
+        .stat-card p { margin: 4px 0 0; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .quick-actions {
+            text-align: center;
+            margin: 60px 0 40px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-outline {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .section-title { text-align: center; font-size: 1.75rem; margin-bottom: 32px; font-weight: 700; }
+
+        .species-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 20px 80px;
+        }
+
+        .species-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .species-card:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            transform: translateY(-4px);
+        }
+
+        .species-card a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: block;
+        }
+
+        .species-card small { color: var(--text-muted); font-size: 0.85rem; display: block; margin-top: 4px; }
+
+        /* Data Sources Section */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 0 20px 80px;
+            text-align: center;
+        }
+
+        .source-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+            display: block;
+        }
+
+        .source-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            transform: translateY(-4px);
+        }
+
+        .source-card h4 { 
+            margin: 0 0 8px 0; 
+            color: var(--primary); 
+            font-size: 1.25rem; 
+            font-weight: 800;
+        }
+        
+        .source-card p { 
+            margin: 0; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1>GenomeWebPlatform</h1>
+            <p class="lead">Advanced exploration of genomic architectures and large-scale viral sequencing analytics.</p>
+            
+            <div class="search-wrapper">
+                <form action="{% url 'species_list' %}" method="get" class="search-container" id="search-form">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        name="q" 
+                        placeholder="Search for virus or strain..." 
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="btn-search">Search</button>
+                </form>
+                <div id="suggestions" class="suggestions-box"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ total_species }}</h3>
+                <p>Taxonomies</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ total_sequences }}</h3>
+                <p>Active Sequences</p>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <a href="{% url 'species_list' %}" class="btn-outline">Explore Repository</a>
+            <a href="{% url 'download_global_fasta' %}" class="btn-outline" style="border-color: var(--success); color: var(--success);">Export FASTA</a>
+        </div>
+
+        <h2 class="section-title">Most Sequenced Species</h2>
+        <div class="species-grid">
+            {% for species in top_species %}
+            <div class="species-card">
+                <a href="{% url 'species_detail' species.id %}">
+                    <em>{{ species.species }}</em>
+                </a>
+                <small>{{ species.sequence_count }} documented samples</small>
+            </div>
+            {% empty %}
+            <p style="text-align: center; grid-column: 1 / -1; color: var(--text-muted);">Waiting for sequencing data...</p>
+            {% endfor %}
+        </div>
+
+        <h2 class="section-title" style="margin-top: 40px;">Data Sources</h2>
+        <div class="sources-grid">
+            <a href="https://www.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" class="source-card">
+                <h4>NCBI</h4>
+                <p>National Center for Biotechnology Information</p>
+            </a>
+            
+            <a href="https://www.bv-brc.org/" target="_blank" rel="noopener noreferrer" class="source-card">
+                <h4>BV-BRC</h4>
+                <p>Bacterial and Viral Bioinformatics Resource Center</p>
+            </a>
+            
+            <a href="https://ngdc.cncb.ac.cn/" target="_blank" rel="noopener noreferrer" class="source-card">
+                <h4>CNCB</h4>
+                <p>China National Center for Bioinformation</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // List from Django context
+        const speciesList = [
+            {% for s in top_species %} "{{ s.species }}", {% endfor %}
+        ];
+
+        const input = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('suggestions');
+
+        input.addEventListener('input', () => {
+            const val = input.value.toLowerCase();
+            suggestionsBox.innerHTML = '';
+            
+            if (val.length < 1) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            const filtered = speciesList.filter(s => s.toLowerCase().includes(val));
+
+            if (filtered.length > 0) {
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('suggestion-item');
+                    div.textContent = item;
+                    div.onclick = () => {
+                        input.value = item;
+                        suggestionsBox.style.display = 'none';
+                        document.getElementById('search-form').submit();
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!document.querySelector('.search-wrapper').contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
