@@ -1,5 +1,8 @@
 # Genome Web Platform
 
+[![DOI](https://zenodo.org/badge/1169399580.svg)](https://doi.org/10.5281/zenodo.20492769)
+
+
 Lightweight Django app for ingesting, storing, and exploring viral genomic sequences at scale.
 
 Key goals: fast bulk import, precomputed statistics for querying, and easy local development with Docker.
