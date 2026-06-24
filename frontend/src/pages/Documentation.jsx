@@ -60,7 +60,7 @@ const compression = [
   {
     title: 'Dataset Compression',
     description:
-      'To facilitate efficient storage and distribution of large-scale genomic data, compression techniques were evaluated using the FABench framework. Several methods were benchmarked according to compression ratio, compression time, and decompression performance. The Nucleotide Archival Format (NAF) initially appeared to be the most suitable option, mainly because of its favourable decompression speed, which is particularly relevant for rapid access to the dataset. However, during practical testing, NAF showed limitations when applied to very large genomic databases. For this reason, the final implementation adopts ZIP, due to its universal compatibility and ease of use, and Zstandard, which offers a suitable compromise between compression efficiency, speed, and scalability.',
+      'To facilitate efficient storage and distribution of large-scale genomic data, compression techniques were evaluated using the FABench framework. Several methods were benchmarked according to compression ratio, compression time, and decompression performance. The Nucleotide Archival Format (NAF) initially appeared to be the most suitable option, mainly because of its favourable decompression speed, which is particularly relevant for rapid access to the dataset. However, during practical testing, NAF showed limitations when applied to very large genomic databases. For this reason, the final implementation adopts ZIP, due to its universal compatibility and ease of use, and Zstandard, which offers a suitable compromise between compression efficiency, speed, and scalability.§',
   },
 ]
 
