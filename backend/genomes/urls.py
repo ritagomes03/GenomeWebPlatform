@@ -7,5 +7,10 @@ router.register(r'taxonomy',  views.TaxonomyViewSet,  basename='taxonomy')
 router.register(r'sequences', views.SequenceViewSet,  basename='sequence')
 router.register(r'global',    views.GlobalViewSet,    basename='global')
 router.register(r'analysis',  views.AnalysisViewSet,  basename='analysis')
+router.register(
+    r'contact',
+    views.ContactMessageViewSet,
+    basename='contact',
+)
 
 urlpatterns = router.urls

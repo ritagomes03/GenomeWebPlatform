@@ -5,6 +5,7 @@ import SpeciesDetail from './pages/SpeciesDetail'
 import SequenceAnalysis from './pages/SequenceAnalysis'
 import Documentation from './pages/Documentation'
 import { usePageAnalytics } from './hooks/useTelemetry'
+import ContactPage from "./pages/ContactPage";
 
 
 function AppRoutes() {
@@ -18,6 +19,7 @@ function AppRoutes() {
       <Route path="/analysis" element={<SequenceAnalysis />} />
       <Route path="/documentation" element={<Documentation />} />
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/contact" element={<ContactPage />} />
     </Routes>
   )
 }

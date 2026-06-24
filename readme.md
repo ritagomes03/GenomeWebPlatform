@@ -81,3 +81,22 @@ Key goals: fast bulk import, precomputed statistics for querying, and easy local
 ## Troubleshooting
 - If migrations fail, confirm DB env vars in `.env` and that the DB container is healthy.
 - If `populate_db` is slow or runs out of memory, try increasing container memory or split CSVs.
+
+
+
+Contact 
+docker compose exec db mysql -u root -p
+SHOW DATABASES;
+USE database_name;
+SHOW TABLES LIKE '%contact%';
+SELECT
+    id,
+    name,
+    email,
+    category,
+    subject,
+    message,
+    status,
+    created_at
+FROM genomes_contactmessage
+ORDER BY created_at DESC;
