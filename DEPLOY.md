@@ -92,14 +92,20 @@ Para sair do servidor no fim: `exit`.
 
 ---
 
-## Passo 3: Pôr o código no servidor
+## Passo 3: Descarregar o código do GitHub
+
+O código está no GitHub: https://github.com/ritagomes03/GenomeWebPlatform
 
 **[SERVIDOR]**
 ```bash
 cd ~
-git clone <endereço-do-repositório> GenomeWebPlatform
+git clone https://github.com/ritagomes03/GenomeWebPlatform.git
 ```
-Isto cria a pasta `GenomeWebPlatform`. Confirma:
+Isto descarrega o código do GitHub e cria a pasta `GenomeWebPlatform`.
+
+Se o repositório for **privado**, o GitHub vai pedir o utilizador e uma palavra-passe. Nesse caso, em vez da palavra-passe usa um *Personal Access Token* (GitHub → Settings → Developer settings → Personal access tokens).
+
+Confirma que a pasta existe:
 ```bash
 ls ~/GenomeWebPlatform
 ```
