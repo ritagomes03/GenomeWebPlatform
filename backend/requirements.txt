@@ -1,5 +1,5 @@
-Django>=5.2,<5.3
-mysqlclient>=2.2.7
-gunicorn>=21.2
-djangorestframework>=3.14
-biopython>=1.83
+Django>=6.1,<6.2
+mysqlclient>=2.3.0
+gunicorn>=26.2
+djangorestframework>=3.18
+biopython>=1.88

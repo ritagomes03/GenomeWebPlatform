@@ -1,0 +1,82 @@
+# Production stack
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml exec backend python manage.py populate_db
+#
+# Only nginx is exposed to the outside world (port 80).
+# MySQL and Django are reachable only inside the Docker network.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    # Apply migrations, collect static files, then start Gunicorn.
+    # Long timeout because sequence analysis requests can take several minutes.
+    command:
+      - sh
+      - -c
+      - >-
+        python manage.py migrate --noinput &&
+        python manage.py collectstatic --noinput &&
+        exec gunicorn config.wsgi:application
+        --bind 0.0.0.0:8000
+        --workers $${GUNICORN_WORKERS:-3}
+        --timeout 600
+        --access-logfile - --error-logfile -
+    volumes:
+      # CSVs and downloadable zips (not baked into the image)
+      - ./backend/data:/app/data:ro
+      # Pre-computed graphs (PDFs)
+      - ./backend/static:/app/static:ro
+      # collectstatic output, shared with nginx
+      - static_files:/app/staticfiles
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db
+      DB_PORT: 3306
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Builds the React app (frontend Dockerfile, "prod" stage), serves it,
+  # and proxies /api and /admin to Django.
+  nginx:
+    build:
+      context: ./frontend
+      target: prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_files:/app/staticfiles:ro
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  static_files:

@@ -5,8 +5,8 @@ Lightweight Django app for ingesting, storing, and exploring viral genomic seque
 Key goals: fast bulk import, precomputed statistics for querying, and easy local development with Docker.
 
 ## Tech stack
-- **Backend:** Django 5.2, Python 3.11
-- **Database:** PostgreSQL 16
+- **Backend:** Django 6.1, Python 3.13
+- **Database:** MySQL 8.4
 - **Containers:** Docker & Docker Compose
 
 ---
