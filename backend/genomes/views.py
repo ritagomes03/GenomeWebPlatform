@@ -8,14 +8,19 @@ from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.http import FileResponse, Http404, HttpResponse
 
-from rest_framework import viewsets
+from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from .utils.uniformizer import STANDARD_HEADER_FIELDS, FIELD_ALIASES
 
-from .models import Sequence, Taxonomy
-from .serializers import SequenceSerializer, TaxonomyDetailSerializer, TaxonomyListSerializer
+from .models import ContactMessage, Sequence, Taxonomy
+from .serializers import (
+    ContactMessageSerializer,
+    SequenceSerializer,
+    TaxonomyDetailSerializer,
+    TaxonomyListSerializer,
+)
 from .services.analysis import build_cleaned_fasta, clean_sequence_id, process_sequence, read_upload
 from .services.graph import build_graph_files, get_graph_base_dirs, species_folder_name
 from .utils.uniformizer import uniformize_sequence_data, _count_original_sequences
@@ -274,3 +279,23 @@ class AnalysisViewSet(viewsets.ViewSet):
             return Response({'error': str(e)}, status=400)
         except Exception as e:
             return Response({'error': f'Erro interno: {str(e)}'}, status=500)
+        
+class ContactMessageViewSet(
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    """
+    Public endpoint used only to submit contact messages.
+
+    Messages can be created through POST requests, but they
+    cannot be publicly listed, retrieved, edited or deleted.
+    """
+
+    queryset = ContactMessage.objects.all()
+    serializer_class = ContactMessageSerializer
+    permission_classes = [permissions.AllowAny]
+
+    http_method_names = [
+        'post',
+        'options',
+    ]
