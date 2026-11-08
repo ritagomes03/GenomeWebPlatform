@@ -56,3 +56,55 @@ class SequenceMetrics(models.Model):
     pct_c = models.FloatField(blank=True, null=True)
     pct_g = models.FloatField(blank=True, null=True)
     pct_t = models.FloatField(blank=True, null=True)
+
+class ContactMessage(models.Model):
+    CATEGORY_CHOICES = [
+        ('database_usage', 'Database usage'),
+        ('sequence_analysis', 'Sequence analysis'),
+        ('data_download', 'Data download'),
+        ('genomic_metrics', 'Genomic metrics'),
+        ('api_access', 'API access'),
+        ('technical_issue', 'Technical issue'),
+        ('scientific_question', 'Scientific question'),
+        ('other', 'Other'),
+    ]
+
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('in_review', 'In review'),
+        ('answered', 'Answered'),
+        ('closed', 'Closed'),
+    ]
+
+    name = models.CharField(max_length=120)
+
+    email = models.EmailField()
+
+    category = models.CharField(
+        max_length=30,
+        choices=CATEGORY_CHOICES,
+    )
+
+    subject = models.CharField(max_length=200)
+
+    message = models.TextField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+        db_index=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.subject} - {self.name}'
